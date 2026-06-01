@@ -221,6 +221,8 @@ const handleLogin = async () => {
         await userStore.loginAction(loginForm)
         ElMessage.success('登录成功')
         router.push('/')
+      } catch {
+        // 错误已在 request 拦截器中处理，此处只需捕获避免冒泡
       } finally {
         loading.value = false
       }
@@ -237,6 +239,8 @@ const handleRegister = async () => {
         await userStore.registerAction(registerForm)
         ElMessage.success('注册成功')
         router.push('/')
+      } catch {
+        // 错误已在 request 拦截器中处理
       } finally {
         loading.value = false
       }

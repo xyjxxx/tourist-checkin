@@ -79,14 +79,18 @@ request.interceptors.response.use(
       case 400:
         ElMessage.error(response.data?.message || '请求参数错误')
         break
-      case 401:
-        ElMessage.error('登录已过期，请重新登录')
-        {
-          const userStore = useUserStore()
+      case 401: {
+        const userStore = useUserStore()
+        const message = response.data?.message || '登录已过期，请重新登录'
+        ElMessage.error(message)
+        // 仅在已有登录态的情况下才清除token并跳转登录页
+        // 登录接口本身的401（密码错误）不需要清除token
+        if (userStore.isLoggedIn) {
           userStore.clearToken()
+          router.push('/login')
         }
-        router.push('/login')
         break
+      }
       case 403:
         ElMessage.error('没有权限执行此操作')
         break
