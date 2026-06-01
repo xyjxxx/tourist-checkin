@@ -6,9 +6,9 @@ spring:
     name: tourist-checkin
 
   datasource:
-    url: jdbc:mysql://localhost:3306/tourist_checkin?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false
+    url: jdbc:mysql://localhost:3306/tourist_checkin?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
     username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:}
+    password: ${DB_PASSWORD:xyj2003517}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       minimum-idle: 5
@@ -36,7 +36,7 @@ mybatis-plus:
 
 # JWT配置 (生产环境请使用环境变量: export JWT_SECRET=xxx)
 jwt:
-  secret: ${JWT_SECRET:}
+  secret: ${JWT_SECRET:my-super-secret-jwt-key-for-tourist-checkin-2024-min32bytes}
   expiration: ${JWT_EXPIRATION:86400000}  # 24小时
 
 # 文件存储配置 (本地存储)
