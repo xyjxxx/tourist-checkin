@@ -1,0 +1,157 @@
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  background: #FFFFFF;
+  box-shadow: 0 -2rpx 20rpx rgba(0, 0, 0, 0.06);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.tab-bar-inner {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: space-around;
+  height: 110rpx;
+  padding: 0 8rpx;
+}
+
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10rpx 0 6rpx;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.tab-item:active {
+  transform: scale(0.9);
+}
+
+.tab-icon-wrap {
+  position: relative;
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-dot {
+  position: absolute;
+  bottom: -8rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: 50%;
+  background: #FB7299;
+  animation: dot-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes dot-pop {
+  0% { transform: translateX(-50%) scale(0); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+
+.tab-label {
+  font-size: 20rpx;
+  color: #AEAEB2;
+  margin-top: 4rpx;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.tab-item.active .tab-label {
+  color: #FB7299;
+  font-weight: 600;
+}
+
+.tab-icon {
+  width: 44rpx;
+  height: 44rpx;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: all 0.2s ease;
+}
+
+.icon-home {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath d='M24 6L4 22h6v18h10v-12h8v12h10V22h6L24 6z' fill='none' stroke='%2386868B' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.icon-home-active {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath d='M24 6L4 22h6v18h10v-12h8v12h10V22h6L24 6z' fill='%23FB7299' stroke='%23FB7299' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.icon-follow {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Ccircle cx='18' cy='16' r='7' fill='none' stroke='%2386868B' stroke-width='3'/%3E%3Cpath d='M4 38c0-7.7 6.3-14 14-14s14 6.3 14 14' fill='none' stroke='%2386868B' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='34' cy='16' r='5' fill='none' stroke='%2386868B' stroke-width='2.5'/%3E%3Cpath d='M30 38c0-5.5 3.4-10 8-10s8 4.5 8 10' fill='none' stroke='%2386868B' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+.icon-follow-active {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Ccircle cx='18' cy='16' r='7' fill='%23FB7299' stroke='%23FB7299' stroke-width='3'/%3E%3Cpath d='M4 38c0-7.7 6.3-14 14-14s14 6.3 14 14' fill='none' stroke='%23FB7299' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='34' cy='16' r='5' fill='%23FB7299' stroke='%23FB7299' stroke-width='2.5'/%3E%3Cpath d='M30 38c0-5.5 3.4-10 8-10s8 4.5 8 10' fill='none' stroke='%23FB7299' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+.icon-publish {
+  width: 40rpx;
+  height: 40rpx;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cline x1='24' y1='12' x2='24' y2='36' stroke='%23FFFFFF' stroke-width='4' stroke-linecap='round'/%3E%3Cline x1='12' y1='24' x2='36' y2='24' stroke='%23FFFFFF' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+.icon-note {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath d='M8 8h24c2.2 0 4 1.8 4 4v24c0 2.2-1.8 4-4 4H8V8z' fill='none' stroke='%2386868B' stroke-width='3' stroke-linejoin='round'/%3E%3Cpath d='M16 8v32' stroke='%2386868B' stroke-width='2.5'/%3E%3Cline x1='22' y1='18' x2='30' y2='18' stroke='%2386868B' stroke-width='2.5' stroke-linecap='round'/%3E%3Cline x1='22' y1='26' x2='30' y2='26' stroke='%2386868B' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+.icon-note-active {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath d='M8 8h24c2.2 0 4 1.8 4 4v24c0 2.2-1.8 4-4 4H8V8z' fill='%23FB7299' stroke='%23FB7299' stroke-width='3' stroke-linejoin='round'/%3E%3Cpath d='M16 8v32' stroke='%23FFFFFF' stroke-width='2.5'/%3E%3Cline x1='22' y1='18' x2='30' y2='18' stroke='%23FFFFFF' stroke-width='2.5' stroke-linecap='round'/%3E%3Cline x1='22' y1='26' x2='30' y2='26' stroke='%23FFFFFF' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+.icon-profile {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Ccircle cx='24' cy='16' r='8' fill='none' stroke='%2386868B' stroke-width='3'/%3E%3Cpath d='M8 40c0-8.8 7.2-16 16-16s16 7.2 16 16' fill='none' stroke='%2386868B' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+.icon-profile-active {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Ccircle cx='24' cy='16' r='8' fill='%23FB7299' stroke='%23FB7299' stroke-width='3'/%3E%3Cpath d='M8 40c0-8.8 7.2-16 16-16s16 7.2 16 16' fill='none' stroke='%23FB7299' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+.tab-item-center {
+  position: relative;
+  top: -20rpx;
+}
+
+.publish-btn {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  background: #FFFFFF;
+  padding: 6rpx;
+  box-shadow: 0 4rpx 20rpx rgba(251, 114, 153, 0.25);
+}
+
+.publish-btn-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FB7299, #FF9AB5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 16rpx rgba(251, 114, 153, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tab-item-center:active .publish-btn-inner {
+  transform: scale(0.9);
+  box-shadow: 0 2rpx 8rpx rgba(251, 114, 153, 0.3);
+}
+
+.tab-label-publish {
+  margin-top: 8rpx;
+  color: #FB7299;
+  font-weight: 600;
+}

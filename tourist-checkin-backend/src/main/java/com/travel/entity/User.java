@@ -23,6 +23,8 @@ public class User {
 
     private String email;
 
+    private String openid;
+
     /**
      * 角色: USER-普通用户, ADMIN-管理员
      */

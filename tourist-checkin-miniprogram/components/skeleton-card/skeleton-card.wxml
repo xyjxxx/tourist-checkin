@@ -1,0 +1,54 @@
+<view class="skeleton-list">
+  <block wx:for="{{items}}" wx:key="*this">
+
+    <!-- 打卡卡片骨架 -->
+    <view wx:if="{{type === 'checkin'}}" class="skeleton-checkin">
+      <view class="sk-header">
+        <view class="sk-avatar skeleton"></view>
+        <view class="sk-info">
+          <view class="sk-line skeleton sk-w60"></view>
+          <view class="sk-line skeleton sk-w40 sk-mt"></view>
+        </view>
+      </view>
+      <view class="sk-line skeleton sk-w90 sk-mt-lg"></view>
+      <view class="sk-line skeleton sk-w70 sk-mt"></view>
+      <view class="sk-image skeleton sk-mt-lg"></view>
+      <view class="sk-footer sk-mt-lg">
+        <view class="sk-action skeleton"></view>
+        <view class="sk-action skeleton"></view>
+      </view>
+    </view>
+
+    <!-- 游记卡片骨架 -->
+    <view wx:if="{{type === 'note'}}" class="skeleton-note">
+      <view class="sk-note-cover skeleton"></view>
+      <view class="sk-note-body">
+        <view class="sk-line skeleton sk-w80"></view>
+        <view class="sk-line skeleton sk-w50 sk-mt"></view>
+        <view class="sk-footer sk-mt">
+          <view class="sk-tag skeleton"></view>
+          <view class="sk-line skeleton sk-w30"></view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 用户行骨架 -->
+    <view wx:if="{{type === 'user'}}" class="skeleton-user">
+      <view class="sk-avatar skeleton"></view>
+      <view class="sk-info">
+        <view class="sk-line skeleton sk-w50"></view>
+      </view>
+      <view class="sk-btn skeleton"></view>
+    </view>
+
+    <!-- 通知行骨架 -->
+    <view wx:if="{{type === 'notification'}}" class="skeleton-notification">
+      <view class="sk-avatar-sm skeleton"></view>
+      <view class="sk-info">
+        <view class="sk-line skeleton sk-w80"></view>
+        <view class="sk-line skeleton sk-w40 sk-mt"></view>
+      </view>
+    </view>
+
+  </block>
+</view>

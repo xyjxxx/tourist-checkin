@@ -1,0 +1,151 @@
+<view class="page">
+  <!-- 顶部 Banner -->
+  <view class="banner">
+    <view class="banner-bg"></view>
+    <view class="banner-content">
+      <text class="banner-emoji">🔥</text>
+      <text class="banner-title">本月热帖</text>
+      <text class="banner-desc">近30天点赞最多的打卡动态</text>
+      <view class="banner-stats">
+        <view class="stat-item">
+          <text class="stat-num">{{hotStats.total}}</text>
+          <text class="stat-label">热门帖子</text>
+        </view>
+        <view class="stat-divider"></view>
+        <view class="stat-item">
+          <text class="stat-num">{{hotStats.today}}</text>
+          <text class="stat-label">今日新增</text>
+        </view>
+        <view class="stat-divider"></view>
+        <view class="stat-item">
+          <text class="stat-num">{{hotStats.week}}</text>
+          <text class="stat-label">本周上榜</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 排序 + 时间筛选 -->
+  <view class="toolbar">
+    <view class="sort-tabs">
+      <view class="sort-tab {{sortTab === 'hot' ? 'active' : ''}}" bindtap="onTapSort" data-tab="hot">
+        <text>🔥 最热</text>
+      </view>
+      <view class="sort-tab {{sortTab === 'new' ? 'active' : ''}}" bindtap="onTapSort" data-tab="new">
+        <text>🕐 最新</text>
+      </view>
+    </view>
+    <scroll-view scroll-x class="time-scroll" enhanced show-scrollbar="{{false}}">
+      <view wx:for="{{timeTabs}}" wx:key="*this" class="time-chip {{activeTime === item ? 'active' : ''}}" bindtap="onTapTime" data-tab="{{item}}">
+        <text>{{item}}</text>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- Loading -->
+  <view wx:if="{{loading && list.length === 0}}" class="loading-state">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 热帖列表 -->
+  <view wx:if="{{list.length > 0}}" class="feed">
+    <view wx:for="{{list}}" wx:key="id" id="card-{{index}}" class="card anim-fade-in-up anim-delay-{{index < 10 ? index + 1 : 10}}" bindtap="onOpenPopup" data-id="{{item.id}}" data-index="{{index}}">
+      <!-- 排名标记 -->
+      <view class="rank-badge rank-{{item.rank <= 3 ? item.rank : 'normal'}}">
+        <text>{{item.rank}}</text>
+      </view>
+      <view class="card-header">
+        <image class="avatar" src="{{item.avatar}}" mode="aspectFill"></image>
+        <view class="user-info">
+          <text class="username">{{item.username}}</text>
+          <view class="location" wx:if="{{item.locationName}}">
+            <text>📍</text><text>{{item.locationName}}</text>
+          </view>
+        </view>
+        <view class="like-badge">
+          <text class="like-icon">❤️</text>
+          <text class="like-count">{{item.likeCount}}</text>
+        </view>
+      </view>
+      <text class="content" wx:if="{{item.content}}">{{item.content}}</text>
+      <view class="images" wx:if="{{item.images && item.images.length > 0}}">
+        <image wx:for="{{item.images}}" wx:for-item="img" wx:key="*this" wx:if="{{index < 3}}" src="{{img}}" mode="aspectFill" class="img"></image>
+        <view wx:if="{{item.images.length > 3}}" class="img-more"><text>+{{item.images.length - 3}}</text></view>
+      </view>
+      <view class="card-footer">
+        <text class="time">{{item.timeText}}</text>
+        <text class="comment-hint">💬 {{item.commentCount || 0}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:if="{{!loading && list.length === 0}}" class="empty">
+    <text class="empty-emoji">📷</text>
+    <text class="empty-title">本月暂无热门打卡</text>
+    <text class="empty-desc">去发布精彩打卡，冲上热帖榜吧</text>
+  </view>
+
+  <!-- 底部提示 -->
+  <view wx:if="{{!loading && list.length > 0}}" class="footer-tip">
+    <view class="footer-line"></view>
+    <text class="footer-text">已展示全部热帖</text>
+    <view class="footer-line"></view>
+  </view>
+
+  <!-- 弹窗 -->
+  <view wx:if="{{popup.show}}" class="popup-mask {{popup.closing ? 'mask-out' : ''}}" bindtap="onClosePopup">
+    <view class="popup-card {{popup.closing ? 'closing' : 'opening'}}" style="{{popup.cardStyle}}" catchtap="noop">
+      <view class="popup-header">
+        <image class="popup-avatar" src="{{popup.checkin.avatar}}" mode="aspectFill"></image>
+        <view class="popup-header-info">
+          <text class="popup-username">{{popup.checkin.username}}</text>
+          <view class="popup-location" wx:if="{{popup.checkin.locationName}}">
+            <text>📍</text><text>{{popup.checkin.locationName}}</text>
+          </view>
+        </view>
+        <text class="popup-time">{{popup.checkin.timeText}}</text>
+      </view>
+      <scroll-view scroll-y class="popup-scroll" enhanced show-scrollbar="{{false}}">
+        <view class="popup-content" wx:if="{{popup.checkin.content}}">
+          <text class="popup-text">{{popup.checkin.content}}</text>
+        </view>
+        <view class="popup-images" wx:if="{{popup.checkin.images && popup.checkin.images.length > 0}}">
+          <view wx:for="{{popup.checkin.images}}" wx:key="*this" class="popup-img-wrap">
+            <image src="{{item}}" mode="widthFix" class="popup-img" bindtap="onPreviewPopupImage" data-src="{{item}}" data-list="{{popup.checkin.images}}"></image>
+          </view>
+        </view>
+        <map wx:if="{{popup.checkin.longitude && popup.checkin.latitude}}" class="popup-map" longitude="{{popup.checkin.longitude}}" latitude="{{popup.checkin.latitude}}" markers="{{popup.markers}}" scale="15" show-location enable-zoom="{{false}}" enable-scroll="{{false}}" />
+        <view class="popup-actions">
+          <view class="popup-action {{popup.liked ? 'liked' : ''}} {{popup.likeAnimating ? 'anim-like-bounce' : ''}}" bindtap="onPopupLike">
+            <text>{{popup.liked ? '❤️' : '🤍'}}</text>
+            <text class="popup-action-count">{{popup.likeCount || 0}}</text>
+          </view>
+          <view class="popup-action">
+            <text>💬</text>
+            <text class="popup-action-count">{{popup.commentCount || 0}}</text>
+          </view>
+        </view>
+        <view class="popup-comments">
+          <text class="popup-section-title">评论 ({{popup.comments.length}})</text>
+          <view wx:if="{{popup.comments.length === 0}}" class="popup-empty">
+            <text class="popup-empty-text">暂无评论，快来抢沙发~</text>
+          </view>
+          <view wx:for="{{popup.comments}}" wx:key="id" class="popup-comment-item">
+            <view class="popup-comment-head">
+              <text class="popup-comment-user">{{item.username}}</text>
+              <text class="popup-comment-time">{{item.timeText}}</text>
+            </view>
+            <text class="popup-comment-body">{{item.content}}</text>
+          </view>
+        </view>
+        <view style="height: 120rpx;"></view>
+      </scroll-view>
+      <view class="popup-input-bar">
+        <input class="popup-input" placeholder="写评论..." value="{{popup.commentText}}" bindinput="onPopupCommentInput" bindconfirm="onPopupSendComment" confirm-type="send" />
+        <view class="popup-send-btn {{popup.commentText ? 'active' : ''}}" bindtap="onPopupSendComment">发送</view>
+      </view>
+    </view>
+  </view>
+</view>

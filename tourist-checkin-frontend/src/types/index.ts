@@ -68,9 +68,12 @@ export interface ApiResponse<T> {
 
 export interface AdminUser {
   id: number
+  account: string
   username: string
   avatar: string
+  backgroundImage: string
   email: string
+  openid: string | null
   role: UserRole
   createdAt: string
 }
@@ -125,6 +128,7 @@ export interface TopicItem {
 export interface AchievementItem {
   id: number; code: string; name: string; description: string
   icon?: string; category: string; level: number
+  conditionType?: string; conditionValue?: number
   progress: number; isUnlocked: boolean; unlockedAt?: string; pointsReward: number
 }
 export interface ChallengeItem {
@@ -138,7 +142,7 @@ export interface TravelNote {
   coverImage?: string; content: string; city?: string; tags: string[]
   checkInPoints: CheckIn[]; viewCount: number; likeCount: number
   collectCount: number; commentCount: number; hasLiked: boolean
-  hasCollected: boolean; createdAt: string; updatedAt: string
+  hasCollected: boolean; isPinned?: boolean; createdAt: string; updatedAt: string
 }
 export interface TravelNoteBrief {
   id: number; author: UserBrief; title: string; summary?: string
@@ -162,6 +166,7 @@ export interface MerchantPosition {
   longitude: number; latitude: number; rating: number
   priceLevel: number; tags?: string[]; coverImage?: string
   distance: number; phone?: string; businessHours?: string; description?: string
+  status?: number; createdAt?: string
 }
 
 // ==================== 行程规划 ====================
@@ -190,3 +195,23 @@ export interface UserReport {
 }
 export interface HeatmapPoint { date: string; count: number }
 export interface ChartData { labels: string[]; values: number[]; seriesName: string }
+
+// ==================== 管理后台 ====================
+export interface AdminOverview {
+  totalUsers: number; totalCheckIns: number; totalTravelNotes: number
+  totalTripPlans: number; totalComments: number; totalLocations: number
+  todayNewUsers: number; todayCheckIns: number
+}
+
+export const ContentStatus = {
+  DRAFT: 0,
+  PUBLISHED: 1,
+  PENDING: -1,
+  REJECTED: -2,
+} as const
+
+export const ReportStatus = {
+  PENDING: 0,
+  HANDLED: 1,
+  REJECTED: -1,
+} as const

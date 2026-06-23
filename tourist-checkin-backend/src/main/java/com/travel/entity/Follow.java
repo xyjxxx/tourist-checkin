@@ -12,6 +12,7 @@ public class Follow {
     private Long followerId;
     private Long followeeId;
     private Integer status;
+    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

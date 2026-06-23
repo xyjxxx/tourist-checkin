@@ -1,0 +1,217 @@
+<view class="page-container">
+
+  <!-- ====== 游客引导 ====== -->
+  <view wx:if="{{!userInfo.id}}" class="guest-container anim-fade-in-scale">
+    <view class="guest-hero">
+      <view class="guest-bg-shape shape-1"></view>
+      <view class="guest-bg-shape shape-2"></view>
+      <view class="guest-logo">
+        <image class="guest-logo-img" src="/assets/logo-travel.jpg" mode="aspectFill"></image>
+      </view>
+      <text class="guest-title">拾光旅记</text>
+      <text class="guest-subtitle">山河辽阔，人间锦绣，用镜头与文字，留存转瞬即逝的美好</text>
+    </view>
+    <view class="guest-features">
+      <view class="guest-feature-item">
+        <view class="feature-icon-wrap feature-icon-pink">
+          <text class="feature-icon">📍</text>
+        </view>
+        <view class="feature-info">
+          <text class="feature-title">打卡记录</text>
+          <text class="feature-desc">标记旅行足迹，留下美好回忆</text>
+        </view>
+      </view>
+      <view class="guest-feature-item">
+        <view class="feature-icon-wrap feature-icon-purple">
+          <text class="feature-icon">📝</text>
+        </view>
+        <view class="feature-info">
+          <text class="feature-title">撰写游记</text>
+          <text class="feature-desc">分享旅行故事和攻略心得</text>
+        </view>
+      </view>
+      <view class="guest-feature-item">
+        <view class="feature-icon-wrap feature-icon-blue">
+          <text class="feature-icon">🗓️</text>
+        </view>
+        <view class="feature-info">
+          <text class="feature-title">行程规划</text>
+          <text class="feature-desc">合理安排每日行程路线</text>
+        </view>
+      </view>
+    </view>
+    <view class="guest-login-btn" bindtap="onGoLogin">
+      <text class="login-btn-text">登录 / 注册</text>
+    </view>
+    <text class="guest-hint">登录后解锁全部功能</text>
+  </view>
+
+  <!-- ====== 已登录用户 ====== -->
+  <block wx:if="{{userInfo.id}}">
+
+    <!-- 顶部背景 + 头像 -->
+    <view class="profile-header">
+      <view class="bg-area" bindtap="onEditBackground">
+        <image wx:if="{{userInfo.backgroundImage}}" class="bg-image" src="{{userInfo.backgroundImage}}" mode="aspectFill"></image>
+        <view class="bg-gradient"></view>
+        <view class="bg-edit-hint">
+          <text class="edit-camera">📷</text>
+          <text class="edit-text">更换背景</text>
+        </view>
+      </view>
+      <view class="user-card">
+        <view class="avatar-wrapper" bindtap="onEditAvatar">
+          <view class="avatar-ring">
+            <image class="user-avatar" src="{{userInfo.avatar || ''}}" mode="aspectFill"></image>
+          </view>
+          <view class="avatar-badge">📷</view>
+        </view>
+        <view class="user-info-area">
+          <view class="username-row" bindtap="onEditUsername">
+            <text class="user-name">{{userInfo.username || '未设置昵称'}}</text>
+            <text class="edit-pen">✏️</text>
+          </view>
+          <text class="user-id" wx:if="{{userInfo.account}}">ID: {{userInfo.account}}</text>
+          <text class="user-bio" wx:if="{{userInfo.bio}}">{{userInfo.bio}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 数据统计卡片 -->
+    <view class="stats-card anim-fade-in-up anim-delay-1">
+      <view class="stat-item" bindtap="onTapStat" data-type="checkins">
+        <view class="stat-value-wrap">
+          <text class="stat-value">{{animatedStats.checkinCount || 0}}</text>
+        </view>
+        <text class="stat-label">打卡</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item" bindtap="onTapStat" data-type="followers">
+        <view class="stat-value-wrap">
+          <text class="stat-value">{{animatedStats.followerCount || 0}}</text>
+        </view>
+        <text class="stat-label">粉丝</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item" bindtap="onTapStat" data-type="following">
+        <view class="stat-value-wrap">
+          <text class="stat-value">{{animatedStats.followingCount || 0}}</text>
+        </view>
+        <text class="stat-label">关注</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item" bindtap="onTapStat" data-type="points">
+        <view class="stat-value-wrap">
+          <text class="stat-value">{{animatedStats.points || 0}}</text>
+        </view>
+        <text class="stat-label">积分</text>
+      </view>
+    </view>
+
+    <!-- 菜单组 1: 我的内容 -->
+    <view class="menu-section anim-fade-in-up anim-delay-2">
+      <text class="menu-section-title">我的内容</text>
+      <view class="menu-group">
+        <view class="menu-item" bindtap="onTapMenu" data-url="/pages/checkin/my">
+          <view class="menu-icon-wrap menu-icon-pink">
+            <text class="menu-icon">📍</text>
+          </view>
+          <text class="menu-text">我的打卡</text>
+          <text class="menu-arrow">›</text>
+        </view>
+        <view class="menu-item" bindtap="onTapMenu" data-url="/pages/collected-notes/collected-notes">
+          <view class="menu-icon-wrap menu-icon-amber">
+            <text class="menu-icon">⭐</text>
+          </view>
+          <text class="menu-text">收藏的游记</text>
+          <text class="menu-arrow">›</text>
+        </view>
+        <view class="menu-item" bindtap="onTapMenu" data-url="/pages/plan-list/plan-list">
+          <view class="menu-icon-wrap menu-icon-blue">
+            <text class="menu-icon">🗓️</text>
+          </view>
+          <text class="menu-text">我的行程</text>
+          <text class="menu-arrow">›</text>
+        </view>
+        <view class="menu-item" bindtap="onTapMenu" data-url="/pages/shop-recommend-list/shop-recommend-list">
+          <view class="menu-icon-wrap menu-icon-green">
+            <text class="menu-icon">🍜</text>
+          </view>
+          <text class="menu-text">我的推荐</text>
+          <text class="menu-arrow">›</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 菜单组 2: 成就与数据 -->
+    <view class="menu-section anim-fade-in-up anim-delay-3">
+      <text class="menu-section-title">成就与数据</text>
+      <view class="menu-group">
+        <view class="menu-item" bindtap="onTapMenu" data-url="/pages/achievements/achievements">
+          <view class="menu-icon-wrap menu-icon-orange">
+            <text class="menu-icon">🏆</text>
+          </view>
+          <text class="menu-text">成就系统</text>
+          <text class="menu-arrow">›</text>
+        </view>
+        <view class="menu-item" bindtap="onTapMenu" data-url="/pages/points/points">
+          <view class="menu-icon-wrap menu-icon-purple">
+            <text class="menu-icon">💰</text>
+          </view>
+          <text class="menu-text">积分记录</text>
+          <text class="menu-arrow">›</text>
+        </view>
+        <view class="menu-item" bindtap="onTapMenu" data-url="/pages/stats/stats">
+          <view class="menu-icon-wrap menu-icon-teal">
+            <text class="menu-icon">📊</text>
+          </view>
+          <text class="menu-text">数据统计</text>
+          <text class="menu-arrow">›</text>
+        </view>
+        <view class="menu-item" bindtap="onTapMenu" data-url="/pages/notes-calendar/notes-calendar">
+          <view class="menu-icon-wrap menu-icon-indigo">
+            <text class="menu-icon">📅</text>
+          </view>
+          <text class="menu-text">打卡日历</text>
+          <text class="menu-arrow">›</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 菜单组 3: 社交与消息 -->
+    <view class="menu-section anim-fade-in-up anim-delay-4">
+      <text class="menu-section-title">社交与消息</text>
+      <view class="menu-group">
+        <view class="menu-item" bindtap="onTapMenu" data-url="/pages/notifications/notifications">
+          <view class="menu-icon-wrap menu-icon-red">
+            <text class="menu-icon">🔔</text>
+            <view wx:if="{{unreadCount > 0}}" class="unread-badge">
+              <text class="unread-text">{{unreadCount > 99 ? '99+' : unreadCount}}</text>
+            </view>
+          </view>
+          <text class="menu-text">消息通知</text>
+          <view class="menu-extra" wx:if="{{unreadCount > 0}}">
+            <text class="extra-dot"></text>
+          </view>
+          <text class="menu-arrow">›</text>
+        </view>
+        <view class="menu-item" bindtap="onTapMenu" data-url="/pages/follow-list/follow-list">
+          <view class="menu-icon-wrap menu-icon-indigo">
+            <text class="menu-icon">👥</text>
+          </view>
+          <text class="menu-text">关注 / 粉丝</text>
+          <text class="menu-arrow">›</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 退出登录 -->
+    <view class="logout-area anim-fade-in-up anim-delay-5">
+      <view class="logout-btn" bindtap="onLogout">
+        <text class="logout-icon">🚪</text>
+        <text class="logout-text">退出登录</text>
+      </view>
+    </view>
+
+  </block>
+</view>

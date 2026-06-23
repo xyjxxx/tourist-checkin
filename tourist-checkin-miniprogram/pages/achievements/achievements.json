@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "成就系统",
+  "usingComponents": {
+    "lottie": "/components/lottie/lottie"
+  }
+}

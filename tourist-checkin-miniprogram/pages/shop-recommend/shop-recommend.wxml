@@ -1,0 +1,295 @@
+<view class="page anim-fade-in-up">
+
+  <!-- 顶部提示横幅 -->
+  <view class="header-banner">
+    <view class="banner-content">
+      <text class="banner-icon">🍜</text>
+      <view class="banner-text-wrap">
+        <text class="banner-title">推荐你心中的宝藏好店</text>
+        <text class="banner-desc">审核通过后将展示给更多旅友</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 店铺名称 -->
+  <view class="form-card">
+    <view class="form-group">
+      <view class="form-label">
+        <text class="label-icon">🏪</text>
+        <text class="label-text">店铺名称</text>
+        <text class="required">*</text>
+      </view>
+      <view class="input-wrap">
+        <input
+          class="form-input"
+          placeholder="请输入店铺名称"
+          placeholder-class="input-placeholder"
+          value="{{name}}"
+          bindinput="onNameInput"
+        />
+      </view>
+    </view>
+
+    <view class="form-divider"></view>
+
+    <!-- 店铺位置 -->
+    <view class="form-group" bindtap="onChooseLocation">
+      <view class="form-label">
+        <text class="label-icon">📍</text>
+        <text class="label-text">店铺位置</text>
+        <text class="required">*</text>
+      </view>
+      <view class="location-card {{address ? 'has-value' : ''}}">
+        <view class="location-row">
+          <view class="location-pin {{address ? 'active' : ''}}">
+            <text class="pin-icon">📍</text>
+          </view>
+          <view class="location-info">
+            <text class="location-text {{address ? '' : 'placeholder'}}">
+              {{address || '点击选择店铺位置'}}
+            </text>
+            <text class="location-hint" wx:if="{{!address}}">支持地图选点与搜索</text>
+          </view>
+          <text class="location-arrow">›</text>
+        </view>
+        <image wx:if="{{longitude && latitude}}" class="map-preview"
+          src="https://restapi.amap.com/v3/staticmap?location={{longitude}},{{latitude}}&zoom=15&size=300*150&key=ebd5eb4cb421c3849a8c88b93e6d9a07"
+          mode="aspectFill" />
+      </view>
+    </view>
+
+    <view class="form-divider"></view>
+
+    <!-- 菜系分类 -->
+    <view class="form-group">
+      <view class="form-label">
+        <text class="label-icon">🍽️</text>
+        <text class="label-text">菜系分类</text>
+        <text class="required">*</text>
+      </view>
+      <view class="category-grid">
+        <view
+          wx:for="{{categories}}" wx:key="*this"
+          class="category-chip {{categoryIndex === index ? 'active' : ''}}"
+          data-index="{{index}}"
+          bindtap="onCategoryTap"
+        >
+          <text>{{item}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-divider"></view>
+
+    <!-- 人均价位 -->
+    <view class="form-group">
+      <view class="form-label">
+        <text class="label-icon">💰</text>
+        <text class="label-text">人均价位</text>
+      </view>
+      <view class="price-input-wrap">
+        <text class="price-symbol">¥</text>
+        <input
+          class="form-input price-input"
+          type="digit"
+          placeholder="0.00"
+          placeholder-class="input-placeholder"
+          value="{{avgPrice}}"
+          bindinput="onAvgPriceInput"
+        />
+        <text class="price-unit">/人</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 实拍图片 -->
+  <view class="form-card">
+    <view class="form-label">
+      <text class="label-icon">📸</text>
+      <text class="label-text">实拍图片</text>
+      <text class="required">*</text>
+    </view>
+    <text class="form-hint">请上传至少3张实拍图片，让其他旅友感受真实体验</text>
+    <view class="image-grid">
+      <view class="image-item" wx:for="{{images}}" wx:key="*this">
+        <image class="thumb" src="{{item}}" mode="aspectFill" />
+        <view class="image-overlay">
+          <view class="delete-btn" data-index="{{index}}" catchtap="onDeleteImage">
+            <text class="delete-icon">×</text>
+          </view>
+        </view>
+      </view>
+      <view class="image-item add-btn" wx:if="{{images.length < 9}}" catchtap="onChooseImage">
+        <view class="add-content">
+          <text class="add-icon">+</text>
+          <text class="add-text">添加图片</text>
+        </view>
+      </view>
+    </view>
+    <view class="image-progress">
+      <view class="progress-bar">
+        <view class="progress-fill" style="width: {{images.length / 9 * 100}}%"></view>
+      </view>
+      <text class="image-count {{images.length < 3 ? 'warn' : 'ok'}}">
+        {{images.length}} / 9 {{images.length < 3 ? '(至少需要3张)' : ''}}
+      </text>
+    </view>
+  </view>
+
+  <!-- 推荐理由 -->
+  <view class="form-card">
+    <view class="form-label">
+      <text class="label-icon">💬</text>
+      <text class="label-text">推荐理由</text>
+      <text class="required">*</text>
+    </view>
+    <text class="form-hint">至少10个字，分享你的真实体验</text>
+    <view class="textarea-wrap {{recommendReason.length > 0 ? 'focus' : ''}}">
+      <textarea
+        class="form-textarea"
+        placeholder="说说你为什么推荐这家店？味道如何？环境怎样？有什么必点菜？"
+        placeholder-class="input-placeholder"
+        maxlength="500"
+        value="{{recommendReason}}"
+        bindinput="onRecommendReasonInput"
+        auto-height
+      />
+    </view>
+    <view class="textarea-footer">
+      <view class="char-meter">
+        <view class="meter-track">
+          <view class="meter-fill {{recommendReason.length >= 10 ? 'valid' : ''}}" style="width: {{recommendReason.length / 500 * 100}}%"></view>
+        </view>
+      </view>
+      <text class="char-count {{recommendReason.length < 10 ? 'warn' : 'ok'}}">{{recommendReason.length}} / 500</text>
+    </view>
+  </view>
+
+  <!-- 选填信息 -->
+  <view class="section-header">
+    <text class="section-title">选填信息</text>
+    <text class="section-subtitle">填写后更容易被推荐</text>
+  </view>
+
+  <view class="form-card optional-card">
+    <view class="form-group">
+      <view class="form-label">
+        <text class="label-icon">🕐</text>
+        <text class="label-text">营业时间</text>
+      </view>
+      <view class="input-wrap">
+        <input
+          class="form-input"
+          placeholder="如：10:00 - 22:00"
+          placeholder-class="input-placeholder"
+          value="{{businessHours}}"
+          bindinput="onBusinessHoursInput"
+        />
+      </view>
+    </view>
+
+    <view class="form-divider"></view>
+
+    <view class="form-group">
+      <view class="form-label">
+        <text class="label-icon">🥘</text>
+        <text class="label-text">招牌菜品</text>
+      </view>
+      <view class="input-wrap">
+        <input
+          class="form-input"
+          placeholder="推荐几道招牌菜"
+          placeholder-class="input-placeholder"
+          value="{{signatureDish}}"
+          bindinput="onSignatureDishInput"
+        />
+      </view>
+    </view>
+
+    <view class="form-divider"></view>
+
+    <view class="form-group">
+      <view class="form-label">
+        <text class="label-icon">📞</text>
+        <text class="label-text">联系方式</text>
+      </view>
+      <view class="input-wrap">
+        <input
+          class="form-input"
+          type="number"
+          placeholder="店铺联系电话"
+          placeholder-class="input-placeholder"
+          value="{{phone}}"
+          bindinput="onPhoneInput"
+        />
+      </view>
+    </view>
+
+    <view class="form-divider"></view>
+
+    <view class="form-group">
+      <view class="form-label">
+        <text class="label-icon">⚠️</text>
+        <text class="label-text">避雷提醒</text>
+      </view>
+      <view class="input-wrap">
+        <input
+          class="form-input"
+          placeholder="有什么需要注意的？"
+          placeholder-class="input-placeholder"
+          value="{{warning}}"
+          bindinput="onWarningInput"
+        />
+      </view>
+    </view>
+  </view>
+
+  <!-- 提交按钮 -->
+  <view class="submit-area">
+    <button
+      class="submit-btn {{submitting ? 'loading' : ''}}"
+      disabled="{{submitting}}"
+      bindtap="onSubmit"
+    >
+      <view class="btn-inner" wx:if="{{!submitting}}">
+        <text class="btn-icon">✨</text>
+        <text>提交推荐</text>
+      </view>
+      <view class="btn-inner btn-loading" wx:else>
+        <view class="btn-spinner"></view>
+        <text>提交中...</text>
+      </view>
+    </button>
+    <text class="submit-tip">提交后将在1-3个工作日内完成审核</text>
+  </view>
+
+  <!-- ===== POI 搜索弹窗 ===== -->
+  <view wx:if="{{showPoiSearch}}" class="poi-overlay" catchtap="onClosePoiSearch">
+    <view class="poi-modal anim-slide-up" catchtap="">
+      <view class="poi-header">
+        <text class="poi-title">搜索店铺位置</text>
+        <text class="poi-close" bindtap="onClosePoiSearch">✕</text>
+      </view>
+      <view class="poi-search-bar">
+        <text class="poi-search-icon">🔍</text>
+        <input class="poi-search-input" placeholder="搜索地点、商家、地址"
+          value="{{poiKeyword}}" bindinput="onPoiSearchInput" focus="true" />
+      </view>
+      <scroll-view scroll-y class="poi-result-list">
+        <view wx:if="{{poiSearching}}" class="poi-loading">
+          <text>搜索中...</text>
+        </view>
+        <view wx:elif="{{poiResults.length === 0 && poiKeyword}}" class="poi-empty">
+          <text>未找到相关地点</text>
+        </view>
+        <view wx:for="{{poiResults}}" wx:key="index" class="poi-item" data-index="{{index}}" bindtap="onSelectPoi">
+          <view class="poi-item-info">
+            <text class="poi-item-name">{{item.name}}</text>
+            <text class="poi-item-addr">{{item.address}}</text>
+          </view>
+          <text class="poi-item-arrow">›</text>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+</view>

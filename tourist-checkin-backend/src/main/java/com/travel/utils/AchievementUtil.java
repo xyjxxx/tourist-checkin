@@ -35,12 +35,19 @@ public class AchievementUtil {
             );
 
             if (userAchievement == null) {
-                userAchievement = new UserAchievement();
-                userAchievement.setUserId(userId);
-                userAchievement.setAchievementId(achievement.getId());
-                userAchievement.setProgress(0);
-                userAchievement.setIsUnlocked(false);
-                userAchievementMapper.insert(userAchievement);
+                try {
+                    userAchievement = new UserAchievement();
+                    userAchievement.setUserId(userId);
+                    userAchievement.setAchievementId(achievement.getId());
+                    userAchievement.setProgress(0);
+                    userAchievement.setIsUnlocked(false);
+                    userAchievementMapper.insert(userAchievement);
+                } catch (org.springframework.dao.DuplicateKeyException e) {
+                    userAchievement = userAchievementMapper.selectOne(
+                            new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<UserAchievement>()
+                                    .eq(UserAchievement::getUserId, userId)
+                                    .eq(UserAchievement::getAchievementId, achievement.getId()));
+                }
             }
 
             if (!userAchievement.getIsUnlocked()) {

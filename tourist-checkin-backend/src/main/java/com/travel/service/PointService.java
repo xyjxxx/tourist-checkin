@@ -11,7 +11,9 @@ import com.travel.vo.UserPointVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +44,7 @@ public class PointService {
         return vo;
     }
 
-    public List<PointRecordVO> getRecords(Long userId, int page, int size) {
+    public Map<String, Object> getRecords(Long userId, int page, int size) {
         LambdaQueryWrapper<PointRecord> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(PointRecord::getUserId, userId)
                .orderByDesc(PointRecord::getCreatedAt);
@@ -50,7 +52,8 @@ public class PointService {
         Page<PointRecord> p = new Page<>(page, size);
         Page<PointRecord> result = pointRecordMapper.selectPage(p, wrapper);
 
-        return result.getRecords().stream().map(r -> {
+        Map<String, Object> map = new HashMap<>();
+        map.put("list", result.getRecords().stream().map(r -> {
             PointRecordVO vo = new PointRecordVO();
             vo.setId(r.getId());
             vo.setType(r.getType());
@@ -59,7 +62,9 @@ public class PointService {
             vo.setBalanceAfter(r.getBalanceAfter());
             vo.setCreatedAt(r.getCreatedAt());
             return vo;
-        }).toList();
+        }).toList());
+        map.put("total", result.getTotal());
+        return map;
     }
 
     private String getLevelName(int level) {

@@ -4,6 +4,7 @@ import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.PutObjectRequest;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -37,6 +38,13 @@ public class OssUtil {
         ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
     }
 
+    @PreDestroy
+    public void destroy() {
+        if (ossClient != null) {
+            ossClient.shutdown();
+        }
+    }
+
     public String uploadFile(MultipartFile file) {
         try {
             String originalFilename = file.getOriginalFilename();
@@ -56,7 +64,12 @@ public class OssUtil {
 
     public void deleteFile(String fileUrl) {
         try {
-            String key = fileUrl.substring(fileUrl.indexOf("travel/"));
+            int idx = fileUrl.indexOf("travel/");
+            if (idx < 0) {
+                log.warn("非 OSS 文件URL，跳过删除: {}", fileUrl);
+                return;
+            }
+            String key = fileUrl.substring(idx);
             ossClient.deleteObject(bucketName, key);
         } catch (Exception e) {
             log.error("文件删除失败", e);

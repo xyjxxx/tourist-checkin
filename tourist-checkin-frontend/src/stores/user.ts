@@ -46,6 +46,7 @@ export const useUserStore = defineStore('user', () => {
 
   const logout = () => {
     clearToken()
+    userInfo.value = null
   }
 
   // 注销账号

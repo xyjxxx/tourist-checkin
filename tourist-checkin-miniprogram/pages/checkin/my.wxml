@@ -1,0 +1,33 @@
+<view class="page-container">
+  <view wx:if="{{checkinList.length > 0}}" class="checkin-list">
+    <view wx:for="{{checkinList}}" wx:key="id" class="checkin-item"
+          bindtap="onTapCheckin" data-id="{{item.id}}"
+          bindlongpress="onLongPressCheckin">
+      <view class="checkin-content" wx:if="{{item.content}}">
+        <text class="content-text">{{item.content}}</text>
+      </view>
+      <view class="checkin-images" wx:if="{{item.images && item.images.length > 0}}">
+        <view wx:for="{{item.images}}" wx:for-item="img" wx:key="*this" class="image-thumb">
+          <image src="{{img}}" mode="aspectFill" class="thumb-img"></image>
+        </view>
+      </view>
+      <view class="checkin-meta">
+        <text class="meta-time">{{item.timeText}}</text>
+        <text class="meta-location" wx:if="{{item.locationName}}">{{item.locationName}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{!loading && checkinList.length === 0}}" class="empty-state">
+    <text class="empty-icon">📍</text>
+    <text class="empty-text">还没有打卡记录</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-more">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:if="{{!hasMore && checkinList.length > 0}}" class="no-more">
+    <text>没有更多了</text>
+  </view>
+</view>

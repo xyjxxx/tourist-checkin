@@ -1,0 +1,61 @@
+<view class="page-container">
+  <!-- Stats summary -->
+  <view class="summary-card">
+    <view class="summary-item">
+      <text class="summary-value">{{totalDays}}</text>
+      <text class="summary-label">累计打卡</text>
+    </view>
+    <view class="summary-divider"></view>
+    <view class="summary-item">
+      <text class="summary-value">{{currentStreak}}</text>
+      <text class="summary-label">连续打卡</text>
+    </view>
+    <view class="summary-divider"></view>
+    <view class="summary-item">
+      <text class="summary-value">{{monthDays}}</text>
+      <text class="summary-label">本月打卡</text>
+    </view>
+  </view>
+
+  <!-- Month navigator -->
+  <view class="month-nav">
+    <text class="nav-arrow" bindtap="onPrevMonth">‹</text>
+    <text class="month-title">{{year}}年{{month}}月</text>
+    <text class="nav-arrow" bindtap="onNextMonth">›</text>
+  </view>
+
+  <!-- Calendar grid -->
+  <view class="calendar">
+    <view class="weekday-row">
+      <text wx:for="{{weekdays}}" wx:key="*this" class="weekday-cell">{{item}}</text>
+    </view>
+    <view class="days-grid">
+      <view wx:for="{{days}}" wx:key="index" class="day-cell {{item.isCurrentMonth ? '' : 'other-month'}} {{item.isChecked ? 'checked' : ''}} {{item.isToday ? 'today' : ''}}">
+        <text class="day-num">{{item.day}}</text>
+        <view wx:if="{{item.isChecked}}" class="check-dot"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Month list of checkins -->
+  <view class="month-list" wx:if="{{monthCheckins.length > 0}}">
+    <text class="list-title">本月打卡记录</text>
+    <view wx:for="{{monthCheckins}}" wx:key="id" class="checkin-item" bindtap="onTapCheckin" data-id="{{item.id}}">
+      <view class="checkin-date">
+        <text class="date-day">{{item.dayNum}}</text>
+        <text class="date-weekday">{{item.weekday}}</text>
+      </view>
+      <view class="checkin-info">
+        <text class="checkin-content">{{item.content || '无文字内容'}}</text>
+        <text class="checkin-location" wx:if="{{item.locationName}}">📍 {{item.locationName}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{!loading && monthCheckins.length === 0}}" class="empty-state">
+    <text class="empty-icon">📅</text>
+    <text class="empty-text">本月暂无打卡记录</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-more"><text>加载中...</text></view>
+</view>

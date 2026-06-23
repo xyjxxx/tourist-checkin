@@ -10,6 +10,7 @@ public class Comment {
     @TableId(type = IdType.AUTO)
     private Long id;
     private Long checkInId;
+    private Long noteId;
     private Long userId;
     private Long parentId;
     private Long replyToId;

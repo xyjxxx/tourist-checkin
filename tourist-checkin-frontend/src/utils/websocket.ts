@@ -7,8 +7,16 @@ let heartbeatTimer: number | null = null
 let reconnectAttempts = 0
 const MAX_RECONNECT_ATTEMPTS = 10
 let isLoggedIn = false
+let getToken: (() => string | null) | null = null
 
-export function connectWebSocket(token: string) {
+export function connectWebSocket(tokenOrGetter: string | (() => string | null)) {
+  if (typeof tokenOrGetter === 'function') {
+    getToken = tokenOrGetter
+  } else {
+    getToken = () => tokenOrGetter
+  }
+
+  const token = getToken()
   if (!token) return
 
   isLoggedIn = true
@@ -36,7 +44,7 @@ export function connectWebSocket(token: string) {
   ws.onclose = () => {
     stopHeartbeat()
     if (isLoggedIn) {
-      scheduleReconnect(token)
+      scheduleReconnect()
     }
   }
 
@@ -81,7 +89,7 @@ function stopHeartbeat() {
   }
 }
 
-function scheduleReconnect(token: string) {
+function scheduleReconnect() {
   if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
     console.log('WebSocket 重连次数超限，停止重连')
     return
@@ -93,8 +101,8 @@ function scheduleReconnect(token: string) {
 
   console.log(`WebSocket 将在 ${delay / 1000}s 后重连 (第${reconnectAttempts}次)`)
   reconnectTimer = window.setTimeout(() => {
-    if (isLoggedIn) {
-      connectWebSocket(token)
+    if (isLoggedIn && getToken) {
+      connectWebSocket(getToken)
     }
   }, delay)
 }

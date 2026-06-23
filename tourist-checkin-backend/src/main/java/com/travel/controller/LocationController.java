@@ -42,4 +42,29 @@ public class LocationController {
         }
         return Result.success(vo);
     }
+
+    // ==================== 管理员接口 ====================
+
+    @PostMapping("/admin")
+    public Result<LocationVO> adminCreate(@RequestBody com.travel.entity.Location data) {
+        if (data.getName() == null || data.getName().trim().isEmpty()) {
+            return Result.error("地点名称不能为空");
+        }
+        data.setId(null);
+        data.setDeleted(0);
+        data.setCreatedAt(null);
+        return Result.success(locationService.adminCreate(data));
+    }
+
+    @PutMapping("/admin/{id}")
+    public Result<Void> adminUpdate(@PathVariable Long id, @RequestBody com.travel.entity.Location data) {
+        locationService.adminUpdate(id, data);
+        return Result.success();
+    }
+
+    @DeleteMapping("/admin/{id}")
+    public Result<Void> adminDelete(@PathVariable Long id) {
+        locationService.adminDelete(id);
+        return Result.success();
+    }
 }

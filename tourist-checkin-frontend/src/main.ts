@@ -22,7 +22,8 @@ import {
   Delete, Setting, Medal, Coin, DataAnalysis, User, Lock, Message,
   FolderChecked, FolderAdd, Edit, Picture, Location, Clock,
   ChatDotRound, Bell, Close, Check, ArrowLeft, ArrowDown,
-  Upload, Refresh, Filter, Menu, More
+  Upload, Refresh, Filter, Menu, More,
+  Notebook, MapLocation, PriceTag, Trophy, Shop, Position, Warning, Mute, SwitchButton
 } from '@element-plus/icons-vue'
 
 const icons = {
@@ -30,7 +31,8 @@ const icons = {
   Delete, Setting, Medal, Coin, DataAnalysis, User, Lock, Message,
   FolderChecked, FolderAdd, Edit, Picture, Location, Clock,
   ChatDotRound, Bell, Close, Check, ArrowLeft, ArrowDown,
-  Upload, Refresh, Filter, Menu, More
+  Upload, Refresh, Filter, Menu, More,
+  Notebook, MapLocation, PriceTag, Trophy, Shop, Position, Warning, Mute, SwitchButton
 }
 
 for (const [key, component] of Object.entries(icons)) {

@@ -18,7 +18,7 @@ export default {
           600: '#E85D88',
           700: '#D14A76',
           800: '#BA3864',
-          900: '#18191C',
+          900: '#8A2A4A',
         },
         accent: {
           50: '#FFF7ED',
@@ -33,31 +33,32 @@ export default {
           900: '#7C2D12',
         },
         surface: '#FFFFFF',
-        muted: '#F1F2F3',
-        'muted-foreground': '#9499A0',
-        border: '#E3E5E7',
+        muted: '#F5F5F7',
+        'muted-foreground': '#86868B',
+        border: '#E8E8ED',
       },
       fontFamily: {
-        heading: ['PingFang SC', 'system-ui', 'Microsoft YaHei', 'sans-serif'],
-        body: ['PingFang SC', 'system-ui', 'Microsoft YaHei', 'sans-serif'],
+        heading: ['-apple-system', 'PingFang SC', 'SF Pro Display', 'Helvetica Neue', 'Microsoft YaHei', 'sans-serif'],
+        body: ['-apple-system', 'PingFang SC', 'SF Pro Text', 'Helvetica Neue', 'Microsoft YaHei', 'sans-serif'],
       },
       borderRadius: {
-        'card': '12px',
-        'btn': '8px',
-        'dialog': '16px',
+        'card': '16px',
+        'btn': '10px',
+        'dialog': '20px',
       },
       boxShadow: {
-        'card': '0 1px 3px 0 rgba(0,0,0,0.04), 0 1px 2px -1px rgba(0,0,0,0.04)',
-        'card-hover': '0 4px 12px 0 rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.06)',
-        'dialog': '0 20px 60px -12px rgba(0,0,0,0.12)',
-        'nav': '0 1px 3px 0 rgba(0,0,0,0.04)',
+        'card': '0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)',
+        'card-hover': '0 8px 24px -4px rgba(0,0,0,0.08), 0 4px 8px -4px rgba(0,0,0,0.04)',
+        'dialog': '0 24px 64px -16px rgba(0,0,0,0.14)',
+        'nav': '0 1px 3px rgba(0,0,0,0.04)',
         'fab': '0 8px 24px rgba(251,114,153,0.3)',
       },
       animation: {
-        'fade-in': 'fadeIn 0.2s ease-out',
-        'slide-up': 'slideUp 0.3s ease-out',
-        'scale-in': 'scaleIn 0.2s ease-out',
+        'fade-in': 'fadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+        'slide-up': 'slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        'scale-in': 'scaleIn 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
         'breathe': 'breathe 2s ease-in-out infinite',
+        'shimmer': 'shimmer 1.5s ease infinite',
       },
       keyframes: {
         fadeIn: {
@@ -75,6 +76,10 @@ export default {
         breathe: {
           '0%, 100%': { transform: 'scale(1)', opacity: '1' },
           '50%': { transform: 'scale(1.05)', opacity: '0.85' },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '200% 0' },
+          '100%': { backgroundPosition: '-200% 0' },
         },
       },
     }

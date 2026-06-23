@@ -1,0 +1,17 @@
+.page-container { background-color: var(--white); min-height: 100vh; padding-bottom: env(safe-area-inset-bottom); }
+.merchant-cover { width: 100%; height: 400rpx; }
+.merchant-info { padding: var(--space-md); }
+.merchant-name { font-size: 36rpx; font-weight: 700; color: var(--text); margin-bottom: var(--space-12); display: block; }
+.tags-row { display: flex; gap: var(--space-12); margin-bottom: var(--space-sm); }
+.category-tag { font-size: 22rpx; color: var(--primary); background: var(--primary-light); padding: 6rpx var(--space-sm); border-radius: var(--radius-full); }
+.price-tag { font-size: 22rpx; color: var(--warning); background: #FFF8E8; padding: 6rpx var(--space-sm); border-radius: var(--radius-full); }
+.meta-row { margin-bottom: var(--space-sm); }
+.rating { font-size: 28rpx; color: var(--warning); }
+.info-item { display: flex; align-items: flex-start; padding: var(--space-sm) 0; border-bottom: 1rpx solid var(--border-light); gap: var(--space-12); }
+.info-icon { font-size: 28rpx; }
+.info-text { font-size: 28rpx; color: var(--text); flex: 1; }
+.map-area { padding: 0 var(--space-md); margin: var(--space-sm) 0; }
+.action-row { padding: var(--space-md); }
+.action-btn { width: 100%; height: 88rpx; background: var(--primary-gradient-deep); color: var(--white); font-size: 30rpx; font-weight: 600; border-radius: 44rpx; border: none; display: flex; align-items: center; justify-content: center; }
+.action-btn::after { border: none; }
+.loading-state { text-align: center; padding: 100rpx 0; font-size: 28rpx; color: var(--text-secondary); }

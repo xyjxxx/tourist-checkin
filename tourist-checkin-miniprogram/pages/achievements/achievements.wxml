@@ -1,0 +1,33 @@
+<view class="page-container">
+  <view class="achievement-grid">
+    <view wx:for="{{achievements}}" wx:key="id" class="achievement-item {{item.unlocked ? 'unlocked' : 'locked'}} anim-fade-in-scale anim-delay-{{index < 10 ? index + 1 : 10}}">
+      <view class="badge-area {{item.unlocked ? 'anim-celebration' : ''}}">
+        <text class="badge-icon">{{item.icon || '🏆'}}</text>
+      </view>
+      <text class="badge-name">{{item.name}}</text>
+      <text class="badge-desc">{{item.description}}</text>
+      <view wx:if="{{!item.unlocked}}" class="progress-bar">
+        <view class="progress-fill" style="width: {{item.progress || 0}}%"></view>
+      </view>
+      <text wx:if="{{!item.unlocked}}" class="progress-text">{{item.progress || 0}}%</text>
+      <text wx:if="{{item.unlocked}}" class="unlocked-text">已获得</text>
+    </view>
+  </view>
+
+  <view wx:if="{{!loading && achievements.length === 0}}" class="empty-state anim-fade-in-up">
+    <lottie path="/assets/lottie/empty-state.json" autoplay="{{true}}" loop="{{true}}" width="300" height="300" />
+    <text class="empty-text">暂无成就</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-more">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:if="{{showUnlockAnimation}}" class="unlock-overlay" bindtap="onCloseUnlock">
+    <view class="unlock-content anim-pop-in">
+      <lottie path="/assets/lottie/achievement-unlock.json" autoplay="{{true}}" loop="{{false}}" width="300" height="300" />
+      <text class="unlock-text">成就解锁！</text>
+      <text class="unlock-name">{{unlockedAchievement.name}}</text>
+    </view>
+  </view>
+</view>

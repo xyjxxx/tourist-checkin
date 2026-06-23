@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "游记",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "lottie": "/components/lottie/lottie"
+  }
+}

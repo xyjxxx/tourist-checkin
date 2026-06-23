@@ -18,39 +18,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onErrorCaptured, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ref, onErrorCaptured } from 'vue'
 
-const router = useRouter()
 const hasError = ref(false)
 const errorMessage = ref('页面发生错误')
 
-const globalErrorHandler = (event: ErrorEvent) => {
-  console.error('Global error:', event.error)
-  ElMessage.error('发生错误: ' + (event.error?.message || '未知错误'))
-}
-
-const unhandledRejectionHandler = (event: PromiseRejectionEvent) => {
-  console.error('Unhandled promise rejection:', event.reason)
-  ElMessage.error('请求失败: ' + (event.reason?.message || '未知错误'))
-}
-
-onErrorCaptured((err: any) => {
+onErrorCaptured((err: unknown) => {
   hasError.value = true
-  errorMessage.value = err?.message || '未知错误'
+  errorMessage.value = err instanceof Error ? err.message : '未知错误'
   console.error('ErrorBoundary captured:', err)
   return false
-})
-
-onMounted(() => {
-  window.addEventListener('error', globalErrorHandler)
-  window.addEventListener('unhandledrejection', unhandledRejectionHandler)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('error', globalErrorHandler)
-  window.removeEventListener('unhandledrejection', unhandledRejectionHandler)
 })
 
 const reloadPage = () => {
@@ -59,6 +36,6 @@ const reloadPage = () => {
 
 const goHome = () => {
   hasError.value = false
-  router.push('/')
+  window.location.href = '/'
 }
 </script>

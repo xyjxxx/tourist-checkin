@@ -16,7 +16,7 @@ public class FileService {
 
     public String uploadFile(MultipartFile file) {
         if (file == null || file.isEmpty()) {
-            throw new RuntimeException("文件不能为空");
+            throw new com.travel.exception.BadRequestException("文件不能为空");
         }
         return fileStorageUtil.uploadFile(file);
     }

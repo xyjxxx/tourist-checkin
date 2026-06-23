@@ -16,7 +16,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     private final JwtInterceptor jwtInterceptor;
 
-    @Value("${cors.allowed-origins:http://localhost:5173,http://127.0.0.1:5173}")
+    @Value("${cors.allowed-origins:http://localhost:5173,http://127.0.0.1:5173,http://124.221.95.33:5173}")
     private List<String> allowedOrigins;
 
     @Override
@@ -34,6 +34,10 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(jwtInterceptor)
                 .addPathPatterns("/api/**")
-                .excludePathPatterns("/api/user/login", "/api/user/register", "/api/user/forgot-password");
+                .excludePathPatterns(
+                        "/api/user/login", "/api/user/register", "/api/user/forgot-password", "/api/user/wx-login", "/api/user/send-code",
+                        "/api/checkin/recent", "/api/checkin/hot", "/api/checkin/{id}",
+                        "/api/travel-note/hot", "/api/travel-note/recent", "/api/travel-note/{id}",
+                        "/api/travel-note/user/**");
     }
 }

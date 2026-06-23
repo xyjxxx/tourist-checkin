@@ -1,0 +1,50 @@
+<view class="page-container">
+  <view wx:if="{{loading}}" class="loading-state">
+    <text>加载中...</text>
+  </view>
+
+  <block wx:if="{{report && !loading}}">
+    <view class="report-header anim-fade-in-down">
+      <text class="report-title">年度旅行报告</text>
+      <text class="report-subtitle">记录你的每一步旅程</text>
+    </view>
+
+    <view class="stats-grid">
+      <view class="stat-card anim-pop-in anim-delay-1">
+        <text class="stat-icon">📍</text>
+        <text class="stat-number">{{animatedReport.totalCheckIns || 0}}</text>
+        <text class="stat-name">总打卡数</text>
+      </view>
+      <view class="stat-card anim-pop-in anim-delay-2">
+        <text class="stat-icon">🏙️</text>
+        <text class="stat-number">{{animatedReport.totalCities || 0}}</text>
+        <text class="stat-name">到访城市</text>
+      </view>
+      <view class="stat-card anim-pop-in anim-delay-3">
+        <text class="stat-icon">♥</text>
+        <text class="stat-number">{{animatedReport.totalLikes || 0}}</text>
+        <text class="stat-name">获得点赞</text>
+      </view>
+      <view class="stat-card anim-pop-in anim-delay-4">
+        <text class="stat-icon">🔥</text>
+        <text class="stat-number">{{animatedReport.longestStreak || 0}}</text>
+        <text class="stat-name">最长连续打卡</text>
+      </view>
+    </view>
+
+    <view class="highlight-section">
+      <view class="highlight-card anim-fade-in-up anim-delay-5">
+        <text class="highlight-label">最活跃月份</text>
+        <text class="highlight-value">{{report.mostActiveMonth || '--'}}</text>
+      </view>
+      <view class="highlight-card anim-fade-in-up anim-delay-6">
+        <text class="highlight-label">最常去城市</text>
+        <text class="highlight-value">{{report.mostActiveCity || '--'}}</text>
+      </view>
+    </view>
+  </block>
+
+  <view wx:if="{{!report && !loading}}" class="empty-state">
+    <text class="empty-text">暂无统计数据</text>
+  </view>
+</view>

@@ -16,7 +16,7 @@ import java.util.List;
 public class SensitiveWordUtil {
 
     private final SensitiveWordMapper sensitiveWordMapper;
-    private SensitiveWordBs sensitiveWordBs;
+    private volatile SensitiveWordBs sensitiveWordBs;
 
     @PostConstruct
     public void init() {
@@ -24,11 +24,7 @@ public class SensitiveWordUtil {
     }
 
     public void reloadWords() {
-        List<SensitiveWord> words = sensitiveWordMapper.selectList(null);
-        List<String> wordList = words.stream()
-                .filter(w -> w.getIsEnabled() != null && w.getIsEnabled() == 1)
-                .map(SensitiveWord::getWord)
-                .toList();
+        List<String> wordList = sensitiveWordMapper.selectAllWords();
 
         sensitiveWordBs = SensitiveWordBs.newInstance()
                 .ignoreCase(true)
@@ -44,7 +40,8 @@ public class SensitiveWordUtil {
 
     public boolean containsSensitive(String text) {
         if (text == null || text.isEmpty()) return false;
-        return sensitiveWordBs.contains(text);
+        String cleaned = text.replaceAll("(?<=[\\u4e00-\\u9fff])\\s+(?=[\\u4e00-\\u9fff])", "");
+        return sensitiveWordBs.contains(cleaned);
     }
 
     public String replace(String text) {

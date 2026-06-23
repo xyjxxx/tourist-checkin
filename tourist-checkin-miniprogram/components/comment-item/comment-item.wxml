@@ -1,0 +1,35 @@
+<view class="comment-container">
+  <image class="avatar" src="{{comment.avatar}}" mode="aspectFill"></image>
+  <view class="comment-body">
+    <view class="comment-header">
+      <text class="username" bindtap="onTapUsername">{{comment.username}}</text>
+      <text class="comment-time">{{comment.timeText}}</text>
+    </view>
+    <text class="comment-content">{{comment.content}}</text>
+    <view class="comment-actions">
+      <view class="action-btn" bindtap="onLike">
+        <text class="action-icon {{comment.liked ? 'liked' : ''}} {{comment.likeAnimating ? 'anim-like-bounce' : ''}}">♥</text>
+        <text class="action-count">{{comment.likeCount || 0}}</text>
+      </view>
+      <view class="action-btn" bindtap="onReply">
+        <text class="action-icon">💬</text>
+        <text class="action-text">回复</text>
+      </view>
+    </view>
+
+    <!-- 嵌套回复 -->
+    <view class="replies-area" wx:if="{{comment.replies && comment.replies.length > 0}}">
+      <view class="reply-item" wx:for="{{comment.replies}}" wx:key="id">
+        <image class="reply-avatar" src="{{item.avatar}}" mode="aspectFill"></image>
+        <view class="reply-body">
+          <view class="reply-header">
+            <text class="reply-username">{{item.username}}</text>
+            <text class="reply-arrow" wx:if="{{item.replyToUsername}}">回复</text>
+            <text class="reply-to-name" wx:if="{{item.replyToUsername}}">{{item.replyToUsername}}</text>
+          </view>
+          <text class="reply-content">{{item.content}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

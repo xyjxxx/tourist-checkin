@@ -1,0 +1,143 @@
+<view class="page anim-fade-in-up">
+
+  <!-- 页面头部 -->
+  <view class="page-header">
+    <view class="header-bg"></view>
+    <view class="header-content">
+      <view class="header-info">
+        <text class="header-title">我的推荐</text>
+        <text class="header-desc">共 {{list.length}} 条推荐记录</text>
+      </view>
+      <navigator class="header-action" url="/pages/shop-recommend/shop-recommend">
+        <text class="action-icon">+</text>
+        <text class="action-text">推荐好店</text>
+      </navigator>
+    </view>
+
+    <!-- 状态筛选 -->
+    <view class="filter-tabs" wx:if="{{list.length > 0}}">
+      <view
+        class="filter-tab {{activeFilter === 'all' ? 'active' : ''}}"
+        bindtap="onFilterTap" data-filter="all"
+      >全部</view>
+      <view
+        class="filter-tab {{activeFilter === 'approved' ? 'active' : ''}}"
+        bindtap="onFilterTap" data-filter="approved"
+      >
+        <view class="tab-dot dot-approved"></view>
+        已通过
+      </view>
+      <view
+        class="filter-tab {{activeFilter === 'pending' ? 'active' : ''}}"
+        bindtap="onFilterTap" data-filter="pending"
+      >
+        <view class="tab-dot dot-pending"></view>
+        待审核
+      </view>
+      <view
+        class="filter-tab {{activeFilter === 'rejected' ? 'active' : ''}}"
+        bindtap="onFilterTap" data-filter="rejected"
+      >
+        <view class="tab-dot dot-rejected"></view>
+        已驳回
+      </view>
+    </view>
+  </view>
+
+  <!-- 列表 -->
+  <view class="list" wx:if="{{filteredList.length > 0}}">
+    <view class="recommend-card anim-fade-in-up anim-delay-{{index < 10 ? index + 1 : 10}}" wx:for="{{filteredList}}" wx:key="id" data-id="{{item.id}}" bindtap="onTapItem">
+      <!-- 卡片主体 -->
+      <view class="card-body">
+        <view class="card-thumb-wrap">
+          <image class="card-thumb" src="{{item.images[0]}}" mode="aspectFill" />
+          <view class="card-thumb-count" wx:if="{{item.images.length > 1}}">
+            <text class="count-icon">📷</text>
+            <text class="count-text">{{item.images.length}}</text>
+          </view>
+        </view>
+        <view class="card-content">
+          <view class="card-title-row">
+            <text class="card-title">{{item.name}}</text>
+            <view class="status-badge status-{{item.auditStatus || 'pending'}}">
+              <view class="status-dot"></view>
+              <text>{{item.auditStatus === 'approved' ? '已通过' : item.auditStatus === 'rejected' ? '已驳回' : '待审核'}}</text>
+            </view>
+          </view>
+          <view class="card-tags">
+            <view class="chip category-chip">{{item.category}}</view>
+            <view class="chip price-chip" wx:if="{{item.avgPrice}}">¥{{item.avgPrice}}/人</view>
+          </view>
+          <view class="card-meta">
+            <view class="meta-location" wx:if="{{item.city || item.address}}">
+              <text class="meta-icon">📍</text>
+              <text class="meta-text">{{item.city || item.address}}</text>
+            </view>
+          </view>
+          <text class="card-time">{{item.createTime || item.createdAt}}</text>
+        </view>
+      </view>
+
+      <!-- 推荐理由预览 -->
+      <view class="card-reason" wx:if="{{item.recommendReason}}">
+        <text class="reason-text">"{{item.recommendReason}}"</text>
+      </view>
+
+      <!-- 驳回区域 -->
+      <view class="reject-section" wx:if="{{item.auditStatus === 'rejected' && item.auditReason}}">
+        <view class="reject-header">
+          <text class="reject-icon">⚠️</text>
+          <text class="reject-title">驳回原因</text>
+        </view>
+        <text class="reject-reason">{{item.auditReason}}</text>
+        <button class="resubmit-btn" data-id="{{item.id}}" catchtap="onResubmit">
+          <text class="resubmit-icon">✏️</text>
+          <text>修改重提</text>
+        </button>
+      </view>
+
+      <!-- 通过后的查看详情入口 -->
+      <view class="card-action-bar" wx:if="{{item.auditStatus === 'approved' && item.merchantId}}">
+        <view class="action-link">
+          <text class="action-link-text">查看详情</text>
+          <text class="action-link-arrow">›</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!loading && list.length === 0}}">
+    <view class="empty-illustration">
+      <text class="empty-emoji">🍜</text>
+      <view class="empty-circle circle-1"></view>
+      <view class="empty-circle circle-2"></view>
+    </view>
+    <text class="empty-title">还没有推荐过店铺</text>
+    <text class="empty-subtitle">分享你心中的宝藏好店，帮助更多旅友发现美食</text>
+    <navigator class="empty-btn" url="/pages/shop-recommend/shop-recommend">
+      <text class="empty-btn-icon">✨</text>
+      <text class="empty-btn-text">去推荐</text>
+    </navigator>
+  </view>
+
+  <!-- 筛选无结果 -->
+  <view class="empty-state" wx:if="{{!loading && list.length > 0 && filteredList.length === 0}}">
+    <text class="empty-emoji">🔍</text>
+    <text class="empty-title">没有符合条件的推荐</text>
+    <text class="empty-subtitle">试试切换其他筛选条件</text>
+  </view>
+
+  <!-- 加载更多 -->
+  <view class="loading-more" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <view class="no-more" wx:if="{{!hasMore && filteredList.length > 0}}">
+    <view class="no-more-line"></view>
+    <text class="no-more-text">没有更多了</text>
+    <view class="no-more-line"></view>
+  </view>
+
+</view>

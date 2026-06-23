@@ -1,0 +1,49 @@
+<view class="tab-bar">
+  <view class="tab-bar-inner">
+    <!-- Home -->
+    <view class="tab-item {{selected === 0 ? 'active' : ''}}" bindtap="switchTab" data-index="0" data-url="/pages/index/index">
+      <view class="tab-icon-wrap">
+        <view class="tab-icon icon-home {{selected === 0 ? 'icon-home-active' : ''}}"></view>
+        <view wx:if="{{selected === 0}}" class="tab-dot"></view>
+      </view>
+      <text class="tab-label">首页</text>
+    </view>
+
+    <!-- Follow -->
+    <view class="tab-item {{selected === 1 ? 'active' : ''}}" bindtap="switchTab" data-index="1" data-url="/pages/explore/explore">
+      <view class="tab-icon-wrap">
+        <view class="tab-icon icon-follow {{selected === 1 ? 'icon-follow-active' : ''}}"></view>
+        <view wx:if="{{selected === 1}}" class="tab-dot"></view>
+      </view>
+      <text class="tab-label">关注</text>
+    </view>
+
+    <!-- Publish (Center Raised Button) -->
+    <view class="tab-item tab-item-center" bindtap="switchTab" data-index="2" data-url="/pages/checkin/checkin">
+      <view class="publish-btn">
+        <view class="publish-btn-inner">
+          <view class="tab-icon icon-publish"></view>
+        </view>
+      </view>
+      <text class="tab-label tab-label-publish">发布</text>
+    </view>
+
+    <!-- Note -->
+    <view class="tab-item {{selected === 3 ? 'active' : ''}}" bindtap="switchTab" data-index="3" data-url="/pages/note-list/note-list">
+      <view class="tab-icon-wrap">
+        <view class="tab-icon icon-note {{selected === 3 ? 'icon-note-active' : ''}}"></view>
+        <view wx:if="{{selected === 3}}" class="tab-dot"></view>
+      </view>
+      <text class="tab-label">游记</text>
+    </view>
+
+    <!-- Profile -->
+    <view class="tab-item {{selected === 4 ? 'active' : ''}}" bindtap="switchTab" data-index="4" data-url="/pages/profile/profile">
+      <view class="tab-icon-wrap">
+        <view class="tab-icon icon-profile {{selected === 4 ? 'icon-profile-active' : ''}}"></view>
+        <view wx:if="{{selected === 4}}" class="tab-dot"></view>
+      </view>
+      <text class="tab-label">我的</text>
+    </view>
+  </view>
+</view>

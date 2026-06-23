@@ -1,9 +1,9 @@
 import request from './request'
-import type { ApiResponse, TripPlan, TripPlanBrief } from '@/types'
+import type { ApiResponse, TripPlan, TripPlanBrief, TripDay } from '@/types'
 
 export const createTripPlan = (data: {
   title: string; description?: string; city?: string; coverImage?: string
-  startDate?: string; endDate?: string; isPublic?: boolean; days?: any[]
+  startDate?: string; endDate?: string; isPublic?: boolean; days?: TripDay[]
 }): Promise<ApiResponse<TripPlan>> =>
   request.post('/trip-plan', data)
 

@@ -20,6 +20,7 @@ public class CheckInVO {
     private String content;
     private List<String> images;
     private Integer likeCount;
+    private Integer commentCount;
     private Boolean hasLiked;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

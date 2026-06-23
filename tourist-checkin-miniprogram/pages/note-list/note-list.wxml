@@ -1,0 +1,94 @@
+<view class="page-container">
+
+  <!-- 顶部 Tab -->
+  <view class="tabs-bar">
+    <view class="tabs-inner">
+      <view class="tab-item {{activeTab === 'hot' ? 'active' : ''}}" bindtap="onTabChange" data-tab="hot">
+        <text class="tab-icon">🔥</text>
+        <text>热门</text>
+      </view>
+      <view class="tab-item {{activeTab === 'recent' ? 'active' : ''}}" bindtap="onTabChange" data-tab="recent">
+        <text class="tab-icon">🕐</text>
+        <text>最新</text>
+      </view>
+      <view class="tab-item {{activeTab === 'mine' ? 'active' : ''}}" bindtap="onTabChange" data-tab="mine">
+        <text class="tab-icon">📝</text>
+        <text>我的</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 切换动画容器 -->
+  <view class="{{tabSwitching ? 'tab-exit' : 'tab-enter'}}">
+    <!-- 游记列表 -->
+    <view class="note-list" wx:if="{{noteList.length > 0}}">
+      <view wx:for="{{noteList}}" wx:key="id"
+            class="note-card anim-fade-in-up anim-delay-{{index < 10 ? index + 1 : 10}}"
+            bindtap="onTapNote" data-id="{{item.id}}">
+        <!-- 封面 -->
+        <view class="note-cover-wrap">
+          <image class="note-cover" src="{{item.coverImage}}" mode="aspectFill"></image>
+          <view class="cover-badge" wx:if="{{item.city}}">
+            <text class="badge-icon">📍</text>
+            <text class="badge-text">{{item.city}}</text>
+          </view>
+        </view>
+        <!-- 内容 -->
+        <view class="note-body">
+          <text class="note-title">{{item.title}}</text>
+          <view class="note-author">
+            <image class="author-avatar" src="{{item.authorAvatar}}" mode="aspectFill"></image>
+            <text class="author-name">{{item.authorName}}</text>
+          </view>
+          <view class="note-stats">
+            <view class="stat-item">
+              <text class="stat-icon">👁</text>
+              <text class="stat-num">{{item.viewCount || 0}}</text>
+            </view>
+            <view class="stat-item">
+              <text class="stat-icon">❤️</text>
+              <text class="stat-num">{{item.likeCount || 0}}</text>
+            </view>
+            <view class="stat-item" wx:if="{{item.commentCount}}">
+              <text class="stat-icon">💬</text>
+              <text class="stat-num">{{item.commentCount}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view wx:if="{{!loading && noteList.length === 0}}" class="empty-state">
+      <view class="empty-illustration">
+        <text class="empty-emoji">📝</text>
+        <view class="empty-circle circle-1"></view>
+        <view class="empty-circle circle-2"></view>
+      </view>
+      <text class="empty-title">{{activeTab === 'mine' ? '还没有写过游记' : '暂无游记'}}</text>
+      <text class="empty-desc">{{activeTab === 'mine' ? '去记录你的旅行故事吧' : '去发现更多精彩内容'}}</text>
+      <navigator wx:if="{{activeTab === 'mine'}}" class="empty-btn" url="/pages/note-create/note-create">
+        <text class="empty-btn-icon">✏️</text>
+        <text class="empty-btn-text">写游记</text>
+      </navigator>
+    </view>
+
+    <!-- 加载更多 -->
+    <view class="loading-more" wx:if="{{loading && noteList.length > 0}}">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+
+    <view class="loading-state" wx:if="{{loading && noteList.length === 0}}">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+
+    <!-- 到底提示 -->
+    <view class="no-more" wx:if="{{!hasMore && noteList.length > 0}}">
+      <view class="no-more-line"></view>
+      <text class="no-more-text">没有更多了</text>
+      <view class="no-more-line"></view>
+    </view>
+  </view>
+</view>

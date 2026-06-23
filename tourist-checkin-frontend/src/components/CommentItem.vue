@@ -14,7 +14,7 @@
             @click="toggleReply"
           >
             <el-icon :size="14"><ChatDotRound /></el-icon>
-            <span v-if="comment.likeCount">{{ comment.likeCount }}</span>
+            <span v-if="comment.replies?.length">{{ comment.replies.length }}</span>
             回复
           </button>
           <button
@@ -44,10 +44,10 @@
           </div>
         </div>
 
-        <div v-if="comment.replies?.length" class="mt-3 bg-[#F1F2F3]/50 rounded-lg p-3 border border-[#E3E5E7]/50">
+        <div v-if="comment.replies?.length && depth < 3" class="mt-3 bg-[#F1F2F3]/50 rounded-lg p-3 border border-[#E3E5E7]/50">
           <CommentItem
-            v-for="reply in comment.replies" :key="reply.id"
-            :comment="reply" :current-user-id="currentUserId"
+            v-for="reply in comment.replies.filter(r => r.id !== comment.id)" :key="reply.id"
+            :comment="reply" :current-user-id="currentUserId" :depth="depth + 1"
             @reply="(pid, content, ruid, rid) => $emit('reply', pid, content, ruid, rid)"
             @like="$emit('like', reply.id)"
             @delete="(id) => $emit('delete', id)"
@@ -64,7 +64,7 @@ import type { CommentItem as CommentType } from '@/types'
 import { formatDateSafe } from '@/utils/date'
 import { ChatDotRound, Delete } from '@element-plus/icons-vue'
 
-defineProps<{ comment: CommentType; currentUserId: number }>()
+const props = withDefaults(defineProps<{ comment: CommentType; currentUserId: number; depth?: number }>(), { depth: 0 })
 const emit = defineEmits<{
   reply: [parentId: number, content: string, replyToUserId?: number, replyToId?: number]
   like: [id: number]
@@ -78,7 +78,7 @@ const toggleReply = () => { showReply.value = !showReply.value }
 
 const doReply = () => {
   if (!replyContent.value.trim()) return
-  emit('reply', 0, replyContent.value.trim())
+  emit('reply', props.comment.id, replyContent.value.trim(), props.comment.user?.id)
   replyContent.value = ''
   showReply.value = false
 }

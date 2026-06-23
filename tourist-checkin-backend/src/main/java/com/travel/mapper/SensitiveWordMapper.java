@@ -10,6 +10,6 @@ import java.util.List;
 @Mapper
 public interface SensitiveWordMapper extends BaseMapper<SensitiveWord> {
 
-    @Select("SELECT word FROM sensitive_word WHERE status = 1")
+    @Select("SELECT word FROM sensitive_word WHERE is_enabled = 1")
     List<String> selectAllWords();
 }

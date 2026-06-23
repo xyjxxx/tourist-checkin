@@ -1,6 +1,7 @@
 package com.travel.controller;
 
 import com.travel.service.FollowService;
+import com.travel.utils.AuthUtil;
 import com.travel.vo.FollowVO;
 import com.travel.vo.Result;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,21 +19,21 @@ public class FollowController {
 
     @PostMapping("/{userId}")
     public Result<Void> follow(@PathVariable Long userId, HttpServletRequest request) {
-        Long currentUserId = (Long) request.getAttribute("userId");
+        Long currentUserId = requireUserId(request);
         followService.follow(currentUserId, userId);
         return Result.success();
     }
 
     @DeleteMapping("/{userId}")
     public Result<Void> unfollow(@PathVariable Long userId, HttpServletRequest request) {
-        Long currentUserId = (Long) request.getAttribute("userId");
+        Long currentUserId = requireUserId(request);
         followService.unfollow(currentUserId, userId);
         return Result.success();
     }
 
     @GetMapping("/check/{userId}")
     public Result<Boolean> checkFollow(@PathVariable Long userId, HttpServletRequest request) {
-        Long currentUserId = (Long) request.getAttribute("userId");
+        Long currentUserId = requireUserId(request);
         return Result.success(followService.isFollowing(currentUserId, userId));
     }
 
@@ -44,5 +45,9 @@ public class FollowController {
     @GetMapping("/following")
     public Result<List<FollowVO>> following(@RequestParam Long userId) {
         return Result.success(followService.getFollowing(userId));
+    }
+
+    private Long requireUserId(HttpServletRequest request) {
+        return AuthUtil.requireUserId(request);
     }
 }

@@ -1,0 +1,9 @@
+<view class="user-container">
+  <image class="avatar" src="{{user.avatar}}" mode="aspectFill"></image>
+  <view class="user-info">
+    <text class="username">{{user.username}}</text>
+  </view>
+  <view class="follow-btn {{isFollowing ? 'following' : ''}}" bindtap="onToggleFollow">
+    <text>{{isFollowing ? '已关注' : '关注'}}</text>
+  </view>
+</view>

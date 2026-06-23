@@ -11,5 +11,6 @@ public class CheckInTopic {
     private Long id;
     private Long checkInId;
     private Long topicId;
+    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
 }

@@ -1,0 +1,30 @@
+<view class="page-container">
+  <view class="tabs">
+    <view class="tab-item {{activeTab === 'following' ? 'active' : ''}}" bindtap="onTabChange" data-tab="following">
+      <text>关注</text>
+    </view>
+    <view class="tab-item {{activeTab === 'followers' ? 'active' : ''}}" bindtap="onTabChange" data-tab="followers">
+      <text>粉丝</text>
+    </view>
+  </view>
+
+  <view class="user-list">
+    <view wx:for="{{userList}}" wx:key="id" class="user-item">
+      <image class="user-avatar" src="{{item.avatar}}" mode="aspectFill" bindtap="onTapUser" data-id="{{item.id}}"></image>
+      <view class="user-info" bindtap="onTapUser" data-id="{{item.id}}">
+        <text class="user-name">{{item.username}}</text>
+      </view>
+      <view class="follow-btn {{item.isFollowing ? 'following' : ''}}" bindtap="onToggleFollow" data-id="{{item.id}}" data-following="{{item.isFollowing}}">
+        <text>{{item.isFollowing ? '已关注' : '关注'}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{!loading && userList.length === 0}}" class="empty-state">
+    <text class="empty-text">{{activeTab === 'following' ? '暂无关注' : '暂无粉丝'}}</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-more">
+    <text>加载中...</text>
+  </view>
+</view>

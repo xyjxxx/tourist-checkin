@@ -1,0 +1,140 @@
+.card-container {
+  background-color: var(--white);
+  margin: var(--space-12) var(--space-md);
+  padding: var(--space-md);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  transition: transform var(--anim-fast) var(--ease-out), box-shadow var(--anim-fast) ease;
+}
+
+.card-container:active {
+  transform: scale(0.97);
+  box-shadow: var(--shadow-sm);
+}
+
+.card-header {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  margin-bottom: var(--space-20);
+}
+
+.avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  margin-right: var(--space-20);
+  background: var(--bg);
+}
+
+.header-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.username {
+  font-size: 28rpx;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.location-name {
+  font-size: 22rpx;
+  color: var(--text-secondary);
+}
+
+.checkin-time {
+  font-size: 22rpx;
+  color: var(--text-tertiary);
+  margin-left: var(--space-sm);
+}
+
+.card-content {
+  margin-bottom: var(--space-20);
+}
+
+.content-text {
+  font-size: 28rpx;
+  color: var(--text);
+  line-height: 1.7;
+}
+
+.image-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-20);
+}
+
+.image-item {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.image-item.img-count-1 {
+  width: 480rpx;
+  height: 320rpx;
+}
+
+.image-item.img-count-2,
+.image-item.img-count-4 {
+  width: 220rpx;
+  height: 220rpx;
+}
+
+.image-item.img-count-3,
+.image-item.img-count-5,
+.image-item.img-count-6,
+.image-item.img-count-7,
+.image-item.img-count-8,
+.image-item.img-count-9 {
+  width: 218rpx;
+  height: 218rpx;
+}
+
+.grid-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.card-footer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-top: var(--space-sm);
+  border-top: 1rpx solid var(--border-light);
+  gap: 40rpx;
+}
+
+.action-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-lg);
+  min-height: 88rpx;
+  transition: all var(--anim-fast) ease;
+}
+
+.action-item:active {
+  background: var(--bg);
+}
+
+.action-icon {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+}
+
+.action-icon.liked {
+  color: var(--danger);
+}
+
+.action-count {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  font-weight: 500;
+}

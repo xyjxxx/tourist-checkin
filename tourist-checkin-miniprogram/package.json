@@ -1,0 +1,8 @@
+{
+  "name": "tourist-checkin-miniprogram",
+  "version": "2.0.0",
+  "description": "拾光旅记微信小程序",
+  "dependencies": {
+    "lottie-miniprogram": "^1.0.5"
+  }
+}

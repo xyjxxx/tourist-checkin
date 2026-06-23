@@ -1,0 +1,54 @@
+<view class="anim-container" style="width: {{width}}rpx; height: {{height}}rpx;">
+
+  <!-- 真实 Lottie 渲染 -->
+  <canvas
+    wx:if="{{!useFallback}}"
+    type="2d"
+    id="{{canvasId}}"
+    class="lottie-canvas"
+    style="width: {{width}}rpx; height: {{height}}rpx;"
+  ></canvas>
+
+  <!-- CSS 降级动画 -->
+  <block wx:if="{{useFallback}}">
+
+    <!-- 成就解锁：星形闪烁 + 扩散光环 -->
+    <block wx:if="{{animType === 'unlock'}}">
+      <view class="unlock-ring {{loop ? 'loop' : 'once'}}"></view>
+      <view class="unlock-star {{loop ? 'loop' : 'once'}}">⭐</view>
+      <view class="unlock-sparkle s1 {{loop ? 'loop' : 'once'}}">✨</view>
+      <view class="unlock-sparkle s2 {{loop ? 'loop' : 'once'}}">✨</view>
+      <view class="unlock-sparkle s3 {{loop ? 'loop' : 'once'}}">✨</view>
+    </block>
+
+    <!-- 成功：对勾圆圈 -->
+    <block wx:if="{{animType === 'success'}}">
+      <view class="success-circle {{loop ? 'loop' : 'once'}}">
+        <text class="success-check">✓</text>
+      </view>
+      <view class="success-ring {{loop ? 'loop' : 'once'}}"></view>
+    </block>
+
+    <!-- 空状态：浮动元素 -->
+    <block wx:if="{{animType === 'empty'}}">
+      <view class="empty-box {{loop ? 'loop' : 'once'}}">
+        <text class="empty-emoji-inner">📦</text>
+      </view>
+      <view class="empty-dot d1 {{loop ? 'loop' : 'once'}}"></view>
+      <view class="empty-dot d2 {{loop ? 'loop' : 'once'}}"></view>
+      <view class="empty-dot d3 {{loop ? 'loop' : 'once'}}"></view>
+    </block>
+
+    <!-- 撒花：彩色碎片 -->
+    <block wx:if="{{animType === 'confetti'}}">
+      <view class="confetti c1 {{loop ? 'loop' : 'once'}}"></view>
+      <view class="confetti c2 {{loop ? 'loop' : 'once'}}"></view>
+      <view class="confetti c3 {{loop ? 'loop' : 'once'}}"></view>
+      <view class="confetti c4 {{loop ? 'loop' : 'once'}}"></view>
+      <view class="confetti c5 {{loop ? 'loop' : 'once'}}"></view>
+      <view class="confetti c6 {{loop ? 'loop' : 'once'}}"></view>
+    </block>
+
+  </block>
+
+</view>

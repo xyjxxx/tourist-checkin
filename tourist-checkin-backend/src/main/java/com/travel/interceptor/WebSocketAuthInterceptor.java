@@ -26,12 +26,8 @@ public class WebSocketAuthInterceptor implements HandshakeInterceptor {
         if (request instanceof ServletServerHttpRequest servletRequest) {
             HttpServletRequest httpRequest = servletRequest.getServletRequest();
 
-            // 优先从 Sec-WebSocket-Protocol 头部读取 token，避免暴露在 URL 参数中被日志记录
+            // 从 Sec-WebSocket-Protocol 头部读取 token，避免暴露在 URL 参数中被日志记录
             String token = httpRequest.getHeader("Sec-WebSocket-Protocol");
-            if (token == null || token.isEmpty()) {
-                // 降级：兼容旧版从 query parameter 读取（生产环境建议移除）
-                token = httpRequest.getParameter("token");
-            }
 
             if (token == null || !jwtUtil.validateToken(token)) {
                 log.warn("WebSocket 握手失败: token 无效");

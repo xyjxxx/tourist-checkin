@@ -1,0 +1,56 @@
+.action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: var(--white);
+  border-top: 1rpx solid var(--border-light);
+  padding: var(--space-xs) 0;
+  z-index: 100;
+}
+
+.action-bar.safe-area {
+  padding-bottom: calc(var(--space-xs) + env(safe-area-inset-bottom));
+}
+
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 88rpx;
+  gap: 2rpx;
+  position: relative;
+  transition: opacity var(--anim-fast) ease;
+}
+
+.action-btn:active {
+  opacity: 0.6;
+}
+
+.action-icon {
+  font-size: 40rpx;
+  line-height: 1;
+}
+
+.action-label {
+  font-size: 20rpx;
+  color: var(--text-secondary);
+}
+
+.action-btn.active .action-label {
+  color: var(--primary);
+}
+
+.action-count {
+  position: absolute;
+  top: 4rpx;
+  right: 20%;
+  font-size: 18rpx;
+  color: var(--danger);
+  font-weight: 600;
+}

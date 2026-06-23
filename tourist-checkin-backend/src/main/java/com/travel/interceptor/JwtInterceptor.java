@@ -41,7 +41,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         request.setAttribute("userId", userId);
         request.setAttribute("role", role);
 
-        // 管理员接口权限校验（使用前缀匹配防止误拦截普通接口）
+        // 管理员接口权限校验
         String uri = request.getRequestURI();
         if (uri.startsWith("/api/") && uri.contains("/admin/")) {
             if (!"ADMIN".equals(role) && !"SUPER_ADMIN".equals(role)) {

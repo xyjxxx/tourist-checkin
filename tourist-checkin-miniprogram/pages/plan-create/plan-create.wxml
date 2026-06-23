@@ -1,0 +1,59 @@
+<view class="page-container">
+  <view class="form-area">
+    <view class="input-group">
+      <text class="label">行程标题</text>
+      <input class="text-input" placeholder="请输入标题" value="{{title}}" bindinput="onTitleInput" />
+    </view>
+
+    <view class="input-group">
+      <text class="label">行程描述</text>
+      <textarea class="content-input" placeholder="简要描述这次旅行..." value="{{description}}" bindinput="onDescInput" auto-height />
+    </view>
+
+    <view class="input-group">
+      <text class="label">城市</text>
+      <input class="text-input" placeholder="请输入城市" value="{{city}}" bindinput="onCityInput" />
+    </view>
+
+    <view class="input-group row-group">
+      <view class="half-input">
+        <text class="label">开始日期</text>
+        <picker mode="date" value="{{startDate}}" bindchange="onStartDateChange">
+          <view class="picker-value">{{startDate || '选择日期'}}</view>
+        </picker>
+      </view>
+      <view class="half-input">
+        <text class="label">结束日期</text>
+        <picker mode="date" value="{{endDate}}" bindchange="onEndDateChange">
+          <view class="picker-value">{{endDate || '选择日期'}}</view>
+        </picker>
+      </view>
+    </view>
+
+    <view class="days-section">
+      <text class="section-title">每日行程</text>
+      <view wx:for="{{days}}" wx:key="dayIndex" wx:for-index="dayIdx" class="day-block">
+        <view class="day-header">
+          <text class="day-label">第{{item.dayIndex + 1}}天</text>
+          <view class="add-poi-btn" bindtap="onAddPoi" data-day="{{dayIdx}}">+ 添加地点</view>
+        </view>
+        <view wx:for="{{item.pois}}" wx:for-item="poi" wx:for-index="poiIdx" wx:key="_id" class="poi-item">
+          <input class="poi-input" placeholder="地点名称" value="{{poi.name}}" bindinput="onPoiNameInput" data-day="{{dayIdx}}" data-poi="{{poiIdx}}" />
+          <view class="delete-poi" bindtap="onDeletePoi" data-day="{{dayIdx}}" data-poi="{{poiIdx}}">x</view>
+        </view>
+        <view wx:if="{{item.pois.length === 0}}" class="empty-poi">
+          <text>暂无地点，点击上方添加</text>
+        </view>
+      </view>
+      <view class="add-day-btn" bindtap="onAddDay">
+        <text>+ 添加一天</text>
+      </view>
+    </view>
+
+    <view class="submit-area">
+      <button class="submit-btn" bindtap="onSubmit" disabled="{{submitting}}">
+        {{submitting ? '创建中...' : '创建行程'}}
+      </button>
+    </view>
+  </view>
+</view>

@@ -18,6 +18,7 @@ public class TravelNoteCreateDTO {
     private String coverImage;
 
     @NotBlank(message = "游记内容不能为空")
+    @Size(max = 10000, message = "游记内容不能超过10000字")
     private String content;
 
     private String city;

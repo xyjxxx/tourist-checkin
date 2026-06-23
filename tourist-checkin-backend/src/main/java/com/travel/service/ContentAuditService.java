@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -41,14 +43,16 @@ public class ContentAuditService {
         reportMapper.insert(report);
     }
 
-    public List<ReportVO> listReports(int status, int page, int size) {
+    public Map<String, Object> listReports(int status, int page, int size) {
         LambdaQueryWrapper<Report> wrapper = new LambdaQueryWrapper<>();
         if (status >= 0) {
             wrapper.eq(Report::getStatus, status);
         }
         wrapper.orderByDesc(Report::getCreatedAt);
         Page<Report> p = new Page<>(page, size);
-        return reportMapper.selectPage(p, wrapper).getRecords().stream().map(r -> {
+        Page<Report> result = reportMapper.selectPage(p, wrapper);
+        Map<String, Object> map = new HashMap<>();
+        map.put("list", result.getRecords().stream().map(r -> {
             ReportVO vo = new ReportVO();
             vo.setId(r.getId());
             vo.setTargetType(r.getTargetType());
@@ -58,29 +62,34 @@ public class ContentAuditService {
             vo.setStatus(r.getStatus());
             vo.setCreatedAt(r.getCreatedAt());
             return vo;
-        }).toList();
+        }).toList());
+        map.put("total", result.getTotal());
+        return map;
     }
 
     @Transactional
     public void handleReport(Long handlerId, Long reportId, int status, String result) {
         Report report = reportMapper.selectById(reportId);
-        if (report != null) {
-            report.setStatus(status);
-            report.setHandlerId(handlerId);
-            report.setHandleResult(result);
-            report.setHandleTime(LocalDateTime.now());
-            reportMapper.updateById(report);
+        if (report == null) {
+            throw new com.travel.exception.BadRequestException("举报记录不存在");
         }
+        report.setStatus(status);
+        report.setHandlerId(handlerId);
+        report.setHandleResult(result);
+        report.setHandleTime(LocalDateTime.now());
+        reportMapper.updateById(report);
     }
 
-    public List<ImageAuditVO> listImageAudits(int status, int page, int size) {
+    public Map<String, Object> listImageAudits(int status, int page, int size) {
         LambdaQueryWrapper<ImageAudit> wrapper = new LambdaQueryWrapper<>();
         if (status >= 0) {
             wrapper.eq(ImageAudit::getAuditStatus, status);
         }
         wrapper.orderByDesc(ImageAudit::getCreatedAt);
         Page<ImageAudit> p = new Page<>(page, size);
-        return imageAuditMapper.selectPage(p, wrapper).getRecords().stream().map(a -> {
+        Page<ImageAudit> result = imageAuditMapper.selectPage(p, wrapper);
+        Map<String, Object> map = new HashMap<>();
+        map.put("list", result.getRecords().stream().map(a -> {
             ImageAuditVO vo = new ImageAuditVO();
             vo.setId(a.getId());
             vo.setImageUrl(a.getImageUrl());
@@ -90,31 +99,43 @@ public class ContentAuditService {
             vo.setAuditResult(a.getAuditResult());
             vo.setCreatedAt(a.getCreatedAt());
             return vo;
-        }).toList();
+        }).toList());
+        map.put("total", result.getTotal());
+        return map;
     }
 
     @Transactional
     public void auditImage(Long auditorId, Long imageId, int status, String result) {
         ImageAudit audit = imageAuditMapper.selectById(imageId);
-        if (audit != null) {
-            audit.setAuditStatus(status);
-            audit.setAuditResult(result);
-            audit.setAuditorId(auditorId);
-            audit.setAuditTime(LocalDateTime.now());
-            imageAuditMapper.updateById(audit);
+        if (audit == null) {
+            throw new com.travel.exception.BadRequestException("审核记录不存在");
         }
+        audit.setAuditStatus(status);
+        audit.setAuditResult(result);
+        audit.setAuditorId(auditorId);
+        audit.setAuditTime(LocalDateTime.now());
+        imageAuditMapper.updateById(audit);
     }
 
-    public List<String> listSensitiveWords(int page, int size) {
+    public Map<String, Object> listSensitiveWords(int page, int size) {
         LambdaQueryWrapper<SensitiveWord> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(SensitiveWord::getIsEnabled, 1);
         Page<SensitiveWord> p = new Page<>(page, size);
-        return sensitiveWordMapper.selectPage(p, wrapper).getRecords()
-                .stream().map(SensitiveWord::getWord).toList();
+        Page<SensitiveWord> result = sensitiveWordMapper.selectPage(p, wrapper);
+        Map<String, Object> map = new HashMap<>();
+        map.put("list", result.getRecords().stream().map(SensitiveWord::getWord).toList());
+        map.put("total", result.getTotal());
+        return map;
     }
 
     @Transactional
     public void addSensitiveWord(String word, String category, int level) {
+        LambdaQueryWrapper<SensitiveWord> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SensitiveWord::getWord, word);
+        Long count = sensitiveWordMapper.selectCount(wrapper);
+        if (count > 0) {
+            throw new com.travel.exception.BadRequestException("敏感词已存在");
+        }
         SensitiveWord sw = new SensitiveWord();
         sw.setWord(word);
         sw.setCategory(category);

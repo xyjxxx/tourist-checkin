@@ -2,6 +2,7 @@ package com.travel.controller;
 
 import com.travel.dto.ReportCreateDTO;
 import com.travel.service.ContentAuditService;
+import com.travel.utils.AuthUtil;
 import com.travel.vo.Result;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -21,8 +22,12 @@ public class ReportController {
     @PostMapping
     public Result<Void> submitReport(@RequestBody @Valid ReportCreateDTO dto,
                                       HttpServletRequest request) {
-        Long userId = (Long) request.getAttribute("userId");
+        Long userId = requireUserId(request);
         contentAuditService.submitReport(userId, dto);
         return Result.success();
+    }
+
+    private Long requireUserId(HttpServletRequest request) {
+        return AuthUtil.requireUserId(request);
     }
 }

@@ -3,6 +3,8 @@ import { ElMessage } from 'element-plus'
 import router from '@/router'
 import { useUserStore } from '@/stores/user'
 
+let isRedirectingToLogin = false
+
 const request = axios.create({
   baseURL: '/api',
   timeout: 30000,
@@ -16,7 +18,25 @@ const request = axios.create({
 const pendingRequests = new Map<string, AbortController>()
 
 const getRequestKey = (config: any) => {
-  return `${config.method}_${config.url}_${JSON.stringify(config.params || {})}_${JSON.stringify(config.data || {})}`
+  const dataKey = config.data instanceof FormData
+    ? `formData_${Date.now()}_${Math.random()}`
+    : JSON.stringify(config.data || {})
+  return `${config.method}_${config.url}_${JSON.stringify(config.params || {})}_${dataKey}`
+}
+
+// 定期清理过期的 pending requests，防止内存泄漏
+const cleanupTimer = setInterval(() => {
+  pendingRequests.forEach((controller, key) => {
+    if (controller.signal.aborted) {
+      pendingRequests.delete(key)
+    }
+  })
+}, 60000)
+
+export function cleanupPendingRequests() {
+  clearInterval(cleanupTimer)
+  pendingRequests.forEach((controller) => controller.abort())
+  pendingRequests.clear()
 }
 
 const removePendingRequest = (config: any) => {
@@ -29,15 +49,19 @@ const removePendingRequest = (config: any) => {
 
 request.interceptors.request.use(
   (config) => {
-    removePendingRequest(config)
-
     const controller = new AbortController()
     config.signal = controller.signal
+    removePendingRequest(config)
     pendingRequests.set(getRequestKey(config), controller)
 
     const token = sessionStorage.getItem('token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
+    }
+
+    // 文件上传使用更长的超时时间
+    if (config.data instanceof FormData) {
+      config.timeout = 120000 // 2 minutes for file uploads
     }
 
     return config
@@ -53,8 +77,11 @@ request.interceptors.response.use(
 
     const res = response.data
     if (res.code !== 200) {
+      const err = new Error(res.message) as Error & { _handled?: boolean }
+      // 标记已由拦截器处理，视图层不应重复显示错误
+      err._handled = true
       ElMessage.error(res.message || '请求失败')
-      return Promise.reject(new Error(res.message))
+      return Promise.reject(err)
     }
     return res
   },
@@ -81,13 +108,13 @@ request.interceptors.response.use(
         break
       case 401: {
         const userStore = useUserStore()
-        const message = response.data?.message || '登录已过期，请重新登录'
-        ElMessage.error(message)
-        // 仅在已有登录态的情况下才清除token并跳转登录页
-        // 登录接口本身的401（密码错误）不需要清除token
-        if (userStore.isLoggedIn) {
+        if (!isRedirectingToLogin) {
+          isRedirectingToLogin = true
+          const message = response.data?.message || '登录已过期，请重新登录'
+          ElMessage.error(message)
           userStore.clearToken()
-          router.push('/login')
+          router.replace('/login')
+          setTimeout(() => { isRedirectingToLogin = false }, 1000)
         }
         break
       }

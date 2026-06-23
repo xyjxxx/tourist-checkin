@@ -11,6 +11,7 @@ public class CommentVO {
     private Long id;
     private UserBriefVO user;
     private Long checkInId;
+    private Long noteId;
     private Long parentId;
     private UserBriefVO replyToUser;
     private String content;

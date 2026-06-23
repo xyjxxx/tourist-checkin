@@ -1,0 +1,39 @@
+<view class="page-container">
+  <view class="category-tabs">
+    <scroll-view scroll-x class="tabs-scroll">
+      <view wx:for="{{categories}}" wx:key="*this"
+            class="tab-item {{activeCategory === item ? 'active' : ''}}"
+            bindtap="onTapCategory" data-category="{{item}}">
+        <text>{{item}}</text>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="merchant-list" wx:if="{{merchants.length > 0}}">
+    <view wx:for="{{merchants}}" wx:key="id" class="merchant-card" bindtap="onTapMerchant" data-id="{{item.id}}">
+      <view class="merchant-left">
+        <image class="merchant-img" src="{{item.image || ''}}" mode="aspectFill"></image>
+      </view>
+      <view class="merchant-info">
+        <text class="merchant-name">{{item.name}}</text>
+        <view class="merchant-tags">
+          <text class="category-tag">{{item.category}}</text>
+          <text class="price-tag" wx:if="{{item.priceLevel}}">{{item.priceLevel}}</text>
+        </view>
+        <view class="merchant-meta">
+          <text class="rating" wx:if="{{item.rating}}">⭐ {{item.rating}}</text>
+          <text class="distance" wx:if="{{item.distance}}">{{item.distance}}m</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{!loading && merchants.length === 0}}" class="empty-state">
+    <text class="empty-icon">🏪</text>
+    <text class="empty-text">附近暂无商户信息</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-more">
+    <text>加载中...</text>
+  </view>
+</view>

@@ -1,0 +1,131 @@
+.page-container {
+  background-color: var(--bg);
+  min-height: 100vh;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.points-card {
+  background: linear-gradient(135deg, var(--primary), #FF9AB5);
+  margin: var(--space-md);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  color: var(--white);
+}
+
+.points-main {
+  text-align: center;
+  margin-bottom: var(--space-lg);
+}
+
+.points-label {
+  font-size: 26rpx;
+  opacity: 0.8;
+  display: block;
+  margin-bottom: var(--space-xs);
+}
+
+.points-value {
+  font-size: 64rpx;
+  font-weight: 600;
+}
+
+.points-info {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  border-top: 1rpx solid rgba(255, 255, 255, 0.3);
+  padding-top: var(--space-md);
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.info-label {
+  font-size: 24rpx;
+  opacity: 0.8;
+  margin-bottom: 4rpx;
+}
+
+.info-value {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.history-section {
+  background-color: var(--white);
+  margin: 0 var(--space-md) var(--space-md);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--space-sm);
+  display: block;
+}
+
+.history-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) 0;
+  border-bottom: 1rpx solid var(--bg);
+}
+
+.history-item:last-child {
+  border-bottom: none;
+}
+
+.record-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.record-desc {
+  font-size: 28rpx;
+  color: var(--text);
+  margin-bottom: 4rpx;
+}
+
+.record-time {
+  font-size: 22rpx;
+  color: var(--text-secondary);
+}
+
+.record-points {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-left: var(--space-sm);
+}
+
+.record-points.positive {
+  color: var(--primary);
+}
+
+.record-points.negative {
+  color: var(--text-secondary);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 100rpx 0;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+}
+
+.loading-more {
+  text-align: center;
+  padding: var(--space-md) 0;
+  font-size: 26rpx;
+  color: var(--text-secondary);
+}

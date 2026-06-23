@@ -7,8 +7,9 @@ import lombok.Data;
 
 @Data
 public class CommentCreateDTO {
-    @NotNull(message = "打卡ID不能为空")
     private Long checkInId;
+
+    private Long noteId;
 
     private Long parentId;
 

@@ -1,0 +1,64 @@
+<view class="page-container">
+  <view class="profile-header">
+    <view class="bg-area">
+      <image wx:if="{{userInfo.backgroundImage}}" class="bg-image" src="{{userInfo.backgroundImage}}" mode="aspectFill"></image>
+    </view>
+    <view class="user-card">
+      <image class="user-avatar" src="{{userInfo.avatar || ''}}" mode="aspectFill"></image>
+      <text class="user-name">{{userInfo.username || ''}}</text>
+      <text class="user-bio" wx:if="{{userInfo.bio}}">{{userInfo.bio}}</text>
+    </view>
+  </view>
+
+  <view class="stats-row">
+    <view class="stat-item">
+      <text class="stat-value">{{userInfo.checkinCount || 0}}</text>
+      <text class="stat-label">打卡</text>
+    </view>
+    <view class="stat-item" bindtap="onTapFollowers">
+      <text class="stat-value">{{userInfo.followerCount || 0}}</text>
+      <text class="stat-label">粉丝</text>
+    </view>
+    <view class="stat-item" bindtap="onTapFollowing">
+      <text class="stat-value">{{userInfo.followingCount || 0}}</text>
+      <text class="stat-label">关注</text>
+    </view>
+  </view>
+
+  <view class="follow-area">
+    <button class="follow-btn {{isFollowing ? 'following' : ''}}" bindtap="onFollowToggle">
+      {{isFollowing ? '已关注' : '+ 关注'}}
+    </button>
+  </view>
+
+  <view class="section-header">
+    <text class="section-title">TA的打卡</text>
+  </view>
+
+  <view class="checkin-list" wx:if="{{checkinList.length > 0}}">
+    <view wx:for="{{checkinList}}" wx:key="id" class="checkin-item" bindtap="onTapCheckin" data-id="{{item.id}}">
+      <view class="checkin-content" wx:if="{{item.content}}">
+        <text class="content-text">{{item.content}}</text>
+      </view>
+      <view class="checkin-images" wx:if="{{item.images && item.images.length > 0}}">
+        <image wx:for="{{item.images}}" wx:for-item="img" wx:key="*this" class="checkin-img" src="{{img}}" mode="aspectFill"></image>
+      </view>
+      <view class="checkin-meta">
+        <text class="checkin-time">{{item.timeText}}</text>
+        <text class="checkin-location" wx:if="{{item.locationName}}">{{item.locationName}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{!loading && checkinList.length === 0}}" class="empty-state">
+    <text class="empty-text">暂无打卡记录</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-more">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:if="{{!hasMore && checkinList.length > 0}}" class="no-more">
+    <text>没有更多了</text>
+  </view>
+</view>

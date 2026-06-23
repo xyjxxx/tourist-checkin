@@ -34,6 +34,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BindException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result<Void> handleBindException(BindException e) {
         String message = e.getFieldErrors().stream()
                 .map(FieldError::getDefaultMessage)
@@ -59,6 +60,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Result<Void> handleException(Exception e) {
         log.error("系统异常", e);
         return Result.error(500, "系统繁忙，请稍后重试");

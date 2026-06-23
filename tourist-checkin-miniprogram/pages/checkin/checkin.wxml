@@ -1,0 +1,249 @@
+<view class="page-container">
+
+  <!-- ===== 选择发布类型 ===== -->
+  <view wx:if="{{mode === 'select'}}" class="select-screen anim-fade-in-scale">
+    <!-- 顶部 Banner -->
+    <view class="select-banner">
+      <view class="banner-bg-shape shape-1"></view>
+      <view class="banner-bg-shape shape-2"></view>
+      <view class="banner-bg-shape shape-3"></view>
+      <view class="banner-content">
+        <text class="banner-emoji">✈️</text>
+        <text class="banner-title">发布内容</text>
+        <text class="banner-subtitle">选择你想分享的内容类型</text>
+      </view>
+    </view>
+
+    <view class="select-cards">
+      <!-- 打卡 -->
+      <view class="select-card anim-fade-in-up anim-delay-1" bindtap="onSelectCheckin">
+        <view class="card-icon-wrap card-icon-checkin">
+          <text class="card-icon">📍</text>
+        </view>
+        <view class="card-text-wrap">
+          <text class="card-title">发布打卡</text>
+          <text class="card-desc">记录你的旅行足迹，标记此刻位置</text>
+        </view>
+        <text class="card-arrow">›</text>
+      </view>
+
+      <!-- 游记 -->
+      <view class="select-card anim-fade-in-up anim-delay-2" bindtap="onSelectNote">
+        <view class="card-icon-wrap card-icon-note">
+          <text class="card-icon">✏️</text>
+        </view>
+        <view class="card-text-wrap">
+          <text class="card-title">写游记</text>
+          <text class="card-desc">分享精彩的旅行故事和攻略</text>
+        </view>
+        <text class="card-arrow">›</text>
+      </view>
+
+      <!-- 推荐好店 -->
+      <view class="select-card anim-fade-in-up anim-delay-3" bindtap="onSelectShop">
+        <view class="card-icon-wrap card-icon-shop">
+          <text class="card-icon">🍜</text>
+        </view>
+        <view class="card-text-wrap">
+          <text class="card-title">推荐好店</text>
+          <text class="card-desc">推荐你心中的宝藏美食小店</text>
+        </view>
+        <text class="card-arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 打卡表单 ===== -->
+  <block wx:if="{{mode === 'checkin'}}">
+    <!-- 表单头部 -->
+    <view class="form-header anim-fade-in-down">
+      <view class="back-btn" bindtap="onBackToSelect">
+        <text class="back-arrow">‹</text>
+        <text class="back-text">返回</text>
+      </view>
+      <view class="header-center">
+        <text class="form-header-title">发布打卡</text>
+        <text class="header-subtitle">记录此刻足迹</text>
+      </view>
+      <view class="back-btn-placeholder"></view>
+    </view>
+
+    <!-- 地图区域 -->
+    <view class="map-area anim-fade-in-down">
+      <map
+        longitude="{{lng}}"
+        latitude="{{lat}}"
+        markers="{{markers}}"
+        show-location
+        style="width:100%;height:400rpx"
+      />
+      <view class="map-overlay-hint" wx:if="{{!locationName}}">
+        <text class="overlay-icon">📍</text>
+        <text class="overlay-text">点击下方选择位置</text>
+      </view>
+    </view>
+
+    <!-- 表单主体 -->
+    <view class="form-area anim-slide-up" style="animation-delay: 150ms;">
+      <!-- 位置选择 -->
+      <view class="location-card anim-fade-in-up anim-delay-2" bindtap="onChooseLocation">
+        <view class="location-pin {{locationName ? 'active' : ''}}">
+          <text class="pin-icon">📍</text>
+        </view>
+        <view class="location-info">
+          <text class="location-text {{locationName ? '' : 'placeholder'}}">
+            {{locationName || '选择打卡位置'}}
+          </text>
+          <text class="location-hint" wx:if="{{!locationName}}">支持地图选点和搜索</text>
+        </view>
+        <text class="location-arrow">›</text>
+      </view>
+
+      <!-- 内容输入 -->
+      <view class="content-area anim-fade-in-up anim-delay-3">
+        <textarea
+          class="content-input"
+          placeholder="分享你的旅程...&#10;说说这里的风景、美食或感受吧"
+          placeholder-class="content-placeholder"
+          value="{{content}}"
+          bindinput="onContentInput"
+          maxlength="500"
+          auto-height
+        />
+        <view class="content-footer">
+          <text class="char-count {{content.length > 450 ? 'warn' : ''}}">{{content.length}} / 500</text>
+        </view>
+      </view>
+
+      <!-- 图片上传 -->
+      <view class="image-section anim-fade-in-up anim-delay-4">
+        <view class="section-label">
+          <text class="label-icon">📸</text>
+          <text class="label-text">添加照片</text>
+          <text class="label-hint" wx:if="{{imageList.length === 0}}">可选，最多9张</text>
+        </view>
+        <view class="image-grid">
+          <view wx:for="{{imageList}}" wx:key="*this" class="image-item">
+            <image src="{{item}}" mode="aspectFill" class="preview-image" />
+            <view class="image-overlay">
+              <view class="delete-btn" catchtap="onDeleteImage" data-index="{{index}}">
+                <text class="delete-icon">×</text>
+              </view>
+            </view>
+          </view>
+          <view wx:if="{{imageList.length < 9}}" class="image-add" bindtap="onChooseImage">
+            <view class="add-content">
+              <text class="add-icon">+</text>
+              <text class="add-text">添加</text>
+            </view>
+          </view>
+        </view>
+        <view class="image-progress" wx:if="{{imageList.length > 0}}">
+          <view class="progress-bar">
+            <view class="progress-fill" style="width: {{imageList.length / 9 * 100}}%"></view>
+          </view>
+          <text class="image-count">{{imageList.length}} / 9</text>
+        </view>
+      </view>
+
+      <!-- 话题 -->
+      <view class="topic-section anim-fade-in-up anim-delay-5">
+        <view class="section-label">
+          <text class="label-icon">💬</text>
+          <text class="label-text">话题</text>
+          <text class="label-hint">可选，最多5个</text>
+        </view>
+        <view class="topic-tags" wx:if="{{topicTags.length > 0}}">
+          <view wx:for="{{topicTags}}" wx:key="*this" class="topic-tag-item">
+            <text class="tag-hash">#</text>
+            <text class="tag-text">{{item}}</text>
+            <text class="tag-delete" bindtap="onDeleteTopic" data-index="{{index}}">×</text>
+          </view>
+        </view>
+        <view wx:if="{{showTopicInput}}" class="topic-input-row">
+          <view class="topic-input-wrap">
+            <text class="topic-input-hash">#</text>
+            <input class="topic-input" placeholder="输入话题名称" value="{{topicInput}}" bindinput="onTopicInput" bindconfirm="onAddTopic" />
+          </view>
+          <view class="topic-add-btn" bindtap="onAddTopic">
+            <text>添加</text>
+          </view>
+        </view>
+        <view wx:if="{{!showTopicInput && topicTags.length < 5}}" class="add-topic-btn" bindtap="onShowTopicInput">
+          <text class="add-topic-icon">+</text>
+          <text class="add-topic-text">添加话题</text>
+        </view>
+      </view>
+
+      <!-- 推荐本店 -->
+      <view class="recommend-section anim-fade-in-up anim-delay-5" bindtap="onToggleRecommend" wx:if="{{locationName}}">
+        <view class="recommend-card {{recommendShop ? 'checked' : ''}}">
+          <view class="checkbox {{recommendShop ? 'active' : ''}}">
+            <text wx:if="{{recommendShop}}" class="check-icon">✓</text>
+          </view>
+          <view class="recommend-info">
+            <text class="recommend-label">推荐「{{locationName}}」为美食好店</text>
+            <text class="recommend-hint">审核通过后将展示给更多旅友</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 提交按钮 -->
+      <view class="submit-area anim-fade-in-up anim-delay-6">
+        <button
+          class="submit-btn {{submitting ? 'loading' : ''}}"
+          disabled="{{submitting}}"
+          bindtap="onSubmit"
+        >
+          <view class="btn-inner" wx:if="{{!submitting}}">
+            <text class="btn-icon">✨</text>
+            <text>发布打卡</text>
+          </view>
+          <view class="btn-inner btn-loading" wx:else>
+            <view class="btn-spinner"></view>
+            <text>发布中...</text>
+          </view>
+        </button>
+      </view>
+    </view>
+  </block>
+
+  <!-- ===== 成功遮罩 ===== -->
+  <view wx:if="{{showSuccess}}" class="success-overlay anim-fade-in-scale">
+    <view class="success-icon-wrap">
+      <text class="success-check">✓</text>
+    </view>
+    <text class="success-text">打卡成功！</text>
+    <text class="success-subtext">正在跳转...</text>
+  </view>
+
+  <!-- ===== POI 搜索弹窗 ===== -->
+  <view wx:if="{{showPoiSearch}}" class="poi-overlay" catchtap="onClosePoiSearch">
+    <view class="poi-modal anim-slide-up" catchtap="">
+      <view class="poi-header">
+        <text class="poi-title">搜索位置</text>
+        <text class="poi-close" bindtap="onClosePoiSearch">✕</text>
+      </view>
+      <view class="poi-search-bar">
+        <text class="poi-search-icon">🔍</text>
+        <input class="poi-search-input" placeholder="搜索地点、商家、地址"
+          value="{{poiKeyword}}" bindinput="onPoiSearchInput" focus="true" />
+      </view>
+      <scroll-view scroll-y class="poi-result-list">
+        <view wx:if="{{poiSearching}}" class="poi-loading">
+          <text>搜索中...</text>
+        </view>
+        <view wx:elif="{{poiResults.length === 0 && poiKeyword}}" class="poi-empty">
+          <text>未找到相关地点</text>
+        </view>
+        <view wx:for="{{poiResults}}" wx:key="index" class="poi-item" data-index="{{index}}" bindtap="onSelectPoi">
+          <view class="poi-item-info">
+            <text class="poi-item-name">{{item.name}}</text>
+            <text class="poi-item-addr">{{item.address}}</text>
+          </view>
+          <text class="poi-item-arrow">›</text>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+</view>

@@ -18,6 +18,8 @@ const DEFAULT_OPTIONS: CompressOptions = {
 }
 
 export function compressImage(file: File, options: CompressOptions = {}): Promise<File> {
+  if (!file.type.startsWith('image/')) return Promise.reject(new Error('不是图片文件'))
+
   const opts = { ...DEFAULT_OPTIONS, ...options }
 
   // 如果文件已经很小，直接返回
@@ -31,7 +33,6 @@ export function compressImage(file: File, options: CompressOptions = {}): Promis
 
     reader.onload = (e) => {
       const img = new Image()
-      img.src = e.target?.result as string
 
       img.onload = () => {
         const canvas = document.createElement('canvas')
@@ -58,6 +59,9 @@ export function compressImage(file: File, options: CompressOptions = {}): Promis
 
         ctx.drawImage(img, 0, 0, width, height)
 
+        // PNG 保留透明通道，其他格式转为 JPEG
+        const outputType = file.type === 'image/png' ? 'image/png' : 'image/jpeg'
+
         canvas.toBlob(
           (blob) => {
             if (!blob) {
@@ -65,17 +69,18 @@ export function compressImage(file: File, options: CompressOptions = {}): Promis
               return
             }
             const compressedFile = new File([blob], file.name, {
-              type: 'image/jpeg',
+              type: outputType,
               lastModified: Date.now(),
             })
             resolve(compressedFile)
           },
-          'image/jpeg',
+          outputType,
           opts.quality
         )
       }
 
       img.onerror = () => reject(new Error('图片加载失败'))
+      img.src = e.target?.result as string
     }
 
     reader.onerror = () => reject(new Error('文件读取失败'))

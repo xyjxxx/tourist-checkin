@@ -16,6 +16,7 @@ public class TravelNoteVO {
     private String content;
     private String city;
     private List<String> tags;
+    private List<String> images;
     private List<CheckInVO> checkInPoints;
     private Integer viewCount;
     private Integer likeCount;

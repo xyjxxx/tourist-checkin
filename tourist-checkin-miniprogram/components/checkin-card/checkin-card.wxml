@@ -1,0 +1,33 @@
+<view class="card-container">
+  <view class="card-header" bindtap="onTap">
+    <image class="avatar" src="{{checkin.avatar}}" mode="aspectFill"></image>
+    <view class="header-info">
+      <text class="username">{{checkin.username}}</text>
+      <text class="location-name" wx:if="{{checkin.locationName}}">{{checkin.locationName}}</text>
+    </view>
+    <text class="checkin-time">{{checkin.timeText}}</text>
+  </view>
+
+  <view class="card-content" bindtap="onTap" wx:if="{{checkin.content}}">
+    <text class="content-text">{{checkin.content}}</text>
+  </view>
+
+  <view class="image-grid" wx:if="{{checkin.images && checkin.images.length > 0}}">
+    <block wx:for="{{checkin.images}}" wx:key="*this">
+      <view class="image-item img-count-{{checkin.images.length}}">
+        <image src="{{item}}" mode="aspectFill" class="grid-image" bindtap="onPreviewImage" data-src="{{item}}"></image>
+      </view>
+    </block>
+  </view>
+
+  <view class="card-footer">
+    <view class="action-item" bindtap="onLike" data-id="{{checkin.id}}">
+      <text class="action-icon {{checkin.isLiked ? 'liked' : ''}} {{checkin.likeAnimating ? 'anim-like-bounce' : ''}}">♥</text>
+      <text class="action-count">{{checkin.likeCount || 0}}</text>
+    </view>
+    <view class="action-item" bindtap="onTap">
+      <text class="action-icon">💬</text>
+      <text class="action-count">{{checkin.commentCount || 0}}</text>
+    </view>
+  </view>
+</view>

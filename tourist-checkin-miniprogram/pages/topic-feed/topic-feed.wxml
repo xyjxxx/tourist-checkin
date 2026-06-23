@@ -1,0 +1,51 @@
+<view class="page-container">
+  <view class="topic-header">
+    <text class="topic-name">#{{topicName}}</text>
+  </view>
+
+  <view class="feed-list">
+    <view wx:for="{{checkinList}}" wx:key="id" class="checkin-item">
+      <view class="checkin-header">
+        <image class="avatar" src="{{item.avatar}}" mode="aspectFill"></image>
+        <view class="header-info">
+          <text class="username">{{item.username}}</text>
+          <text class="location-name">{{item.locationName}}</text>
+        </view>
+        <text class="checkin-time">{{item.timeText}}</text>
+      </view>
+
+      <view class="checkin-content" wx:if="{{item.content}}">
+        <text class="content-text">{{item.content}}</text>
+      </view>
+
+      <view class="image-grid" wx:if="{{item.images && item.images.length > 0}}">
+        <view wx:for="{{item.images}}" wx:for-item="img" wx:key="*this" class="image-item">
+          <image src="{{img}}" mode="aspectFill" class="grid-image"></image>
+        </view>
+      </view>
+
+      <view class="checkin-footer">
+        <view class="action-item">
+          <text class="action-icon">♥</text>
+          <text class="action-count">{{item.likeCount || 0}}</text>
+        </view>
+        <view class="action-item">
+          <text class="action-icon">💬</text>
+          <text class="action-count">{{item.commentCount || 0}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{!loading && checkinList.length === 0}}" class="empty-state">
+    <text class="empty-text">该话题下暂无打卡</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-more">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:if="{{!hasMore && checkinList.length > 0}}" class="no-more">
+    <text>没有更多了</text>
+  </view>
+</view>

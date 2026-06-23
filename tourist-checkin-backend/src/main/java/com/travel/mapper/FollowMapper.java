@@ -15,9 +15,9 @@ public interface FollowMapper extends BaseMapper<Follow> {
             "WHERE follower_id = #{followerId} AND followee_id = #{followeeId} AND status = 1")
     boolean isFollowing(@Param("followerId") Long followerId, @Param("followeeId") Long followeeId);
 
-    @Select("SELECT * FROM follow WHERE followee_id = #{userId} AND status = 1 ORDER BY created_at DESC")
+    @Select("SELECT * FROM follow WHERE followee_id = #{userId} AND status = 1 ORDER BY created_at DESC LIMIT 500")
     List<Follow> selectFollowers(@Param("userId") Long userId);
 
-    @Select("SELECT * FROM follow WHERE follower_id = #{userId} AND status = 1 ORDER BY created_at DESC")
+    @Select("SELECT * FROM follow WHERE follower_id = #{userId} AND status = 1 ORDER BY created_at DESC LIMIT 500")
     List<Follow> selectFollowing(@Param("userId") Long userId);
 }

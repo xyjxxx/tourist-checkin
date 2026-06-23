@@ -17,5 +17,6 @@ public class Notification {
     private String content;
     private Integer isRead;
     private Integer status;
+    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
 }

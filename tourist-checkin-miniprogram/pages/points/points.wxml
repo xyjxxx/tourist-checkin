@@ -1,0 +1,41 @@
+<view class="page-container">
+  <view class="points-card">
+    <view class="points-main">
+      <text class="points-label">当前积分</text>
+      <text class="points-value">{{totalPoints}}</text>
+    </view>
+    <view class="points-info">
+      <view class="info-item">
+        <text class="info-label">等级</text>
+        <text class="info-value">Lv.{{level}}</text>
+      </view>
+      <view class="info-item">
+        <text class="info-label">可用积分</text>
+        <text class="info-value">{{currentPoints}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="history-section">
+    <text class="section-title">积分记录</text>
+    <view class="history-list">
+      <view wx:for="{{records}}" wx:key="id" class="history-item">
+        <view class="record-info">
+          <text class="record-desc">{{item.description}}</text>
+          <text class="record-time">{{item.timeText}}</text>
+        </view>
+        <text class="record-points {{item.amount > 0 ? 'positive' : 'negative'}}">
+          {{item.amount > 0 ? '+' : ''}}{{item.amount}}
+        </text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{!loading && records.length === 0}}" class="empty-state">
+    <text class="empty-text">暂无积分记录</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-more">
+    <text>加载中...</text>
+  </view>
+</view>

@@ -1,0 +1,20 @@
+.page-container {
+  background-color: var(--bg);
+  min-height: 100vh;
+  padding: var(--space-sm) 0;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.note-list { padding: 0 var(--space-md); }
+.note-item { display: flex; background: var(--white); border-radius: var(--space-20); overflow: hidden; margin-bottom: var(--space-sm); box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.04); }
+.note-cover { width: 220rpx; height: 180rpx; flex-shrink: 0; }
+.note-body { flex: 1; padding: var(--space-sm) var(--space-20); display: flex; flex-direction: column; justify-content: space-between; }
+.note-title { font-size: 28rpx; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.note-meta { display: flex; align-items: center; gap: var(--space-12); }
+.author-name { font-size: 22rpx; color: var(--text-secondary); }
+.note-city { font-size: 20rpx; color: var(--primary); background: var(--primary-light); padding: 4rpx var(--space-12); border-radius: var(--radius-full); }
+.note-stats { display: flex; gap: var(--space-20); }
+.stat { font-size: 22rpx; color: var(--text-tertiary); }
+.empty-state { display: flex; flex-direction: column; align-items: center; padding-top: 200rpx; }
+.empty-icon { font-size: 80rpx; opacity: 0.4; margin-bottom: var(--space-sm); }
+.empty-text { font-size: 28rpx; color: var(--text-tertiary); }
+.loading-more { text-align: center; padding: var(--space-xl) 0; color: var(--text-secondary); font-size: 26rpx; }

@@ -11,5 +11,6 @@ public class CommentLike {
     private Long id;
     private Long commentId;
     private Long userId;
+    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
 }

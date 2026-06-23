@@ -1,0 +1,176 @@
+<view class="page anim-fade-in-up">
+
+  <!-- 顶部引导横幅 -->
+  <view class="header-banner">
+    <view class="banner-bg-shape shape-1"></view>
+    <view class="banner-bg-shape shape-2"></view>
+    <view class="banner-content">
+      <text class="banner-icon">✏️</text>
+      <view class="banner-text-wrap">
+        <text class="banner-title">记录你的旅行故事</text>
+        <text class="banner-desc">分享精彩旅程，帮助更多旅友发现美好</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 标题 -->
+  <view class="form-card">
+    <view class="form-label">
+      <text class="label-icon">📝</text>
+      <text class="label-text">游记标题</text>
+      <text class="required">*</text>
+    </view>
+    <view class="input-wrap">
+      <input
+        class="form-input"
+        placeholder="给游记起个好标题"
+        placeholder-class="input-placeholder"
+        value="{{title}}"
+        bindinput="onTitleInput"
+        maxlength="50"
+      />
+    </view>
+    <view class="input-hint">{{title.length || 0}} / 50</view>
+  </view>
+
+  <!-- 游记内容 -->
+  <view class="form-card">
+    <view class="form-label">
+      <text class="label-icon">📖</text>
+      <text class="label-text">游记内容</text>
+      <text class="required">*</text>
+    </view>
+    <text class="form-hint">写下你的旅行见闻、攻略心得或有趣故事</text>
+    <view class="textarea-wrap {{content.length > 0 ? 'focus' : ''}}">
+      <textarea
+        class="form-textarea"
+        placeholder="分享你的旅行故事...&#10;&#10;可以写写：&#10;· 行程安排和路线推荐&#10;· 值得打卡的景点&#10;· 当地美食和住宿体验&#10;· 旅行中的趣事和感受"
+        placeholder-class="textarea-placeholder"
+        value="{{content}}"
+        bindinput="onContentInput"
+        maxlength="5000"
+        auto-height
+      />
+    </view>
+    <view class="textarea-footer">
+      <view class="char-meter">
+        <view class="meter-track">
+          <view class="meter-fill" style="width: {{content.length / 5000 * 100}}%"></view>
+        </view>
+      </view>
+      <text class="char-count">{{content.length}} / 5000</text>
+    </view>
+  </view>
+
+  <!-- 封面图片 -->
+  <view class="form-card">
+    <view class="form-label">
+      <text class="label-icon">🖼️</text>
+      <text class="label-text">封面图片</text>
+    </view>
+    <text class="form-hint">选一张最美的照片作为封面，吸引更多旅友阅读</text>
+    <view class="cover-area" bindtap="onChooseCover">
+      <image wx:if="{{coverImage}}" src="{{coverImage}}" mode="aspectFill" class="cover-preview" />
+      <view wx:else class="cover-add">
+        <text class="cover-add-icon">+</text>
+        <text class="cover-add-text">选择封面</text>
+        <text class="cover-add-hint">推荐 3:2 比例</text>
+      </view>
+      <view wx:if="{{coverImage}}" class="cover-overlay">
+        <text class="cover-change-text">点击更换</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 城市 & 标签 -->
+  <view class="form-card">
+    <view class="form-group">
+      <view class="form-label">
+        <text class="label-icon">📍</text>
+        <text class="label-text">城市</text>
+      </view>
+      <view class="input-wrap">
+        <input
+          class="form-input"
+          placeholder="游记所在城市"
+          placeholder-class="input-placeholder"
+          value="{{city}}"
+          bindinput="onCityInput"
+        />
+      </view>
+    </view>
+
+    <view class="form-divider"></view>
+
+    <view class="form-group">
+      <view class="form-label">
+        <text class="label-icon">🏷️</text>
+        <text class="label-text">标签</text>
+      </view>
+      <view class="input-wrap">
+        <input
+          class="form-input"
+          placeholder="多个标签用逗号分隔，如：穷游,美食,自驾"
+          placeholder-class="input-placeholder"
+          value="{{tags}}"
+          bindinput="onTagsInput"
+        />
+      </view>
+      <view class="tag-preview" wx:if="{{tags}}">
+        <view class="tag-chip" wx:for="{{tags.split(',')}}" wx:key="*this" wx:if="{{item.trim()}}">
+          <text>#{{item.trim()}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 图片列表 -->
+  <view class="form-card">
+    <view class="form-label">
+      <text class="label-icon">📸</text>
+      <text class="label-text">游记图片</text>
+    </view>
+    <text class="form-hint">添加旅途中的精彩照片，最多9张</text>
+    <view class="image-grid">
+      <view wx:for="{{imageList}}" wx:key="*this" class="image-item">
+        <image src="{{item}}" mode="aspectFill" class="preview-image" />
+        <view class="image-overlay">
+          <view class="delete-btn" bindtap="onDeleteImage" data-index="{{index}}">
+            <text class="delete-icon">×</text>
+          </view>
+        </view>
+      </view>
+      <view wx:if="{{imageList.length < 9}}" class="image-add" bindtap="onChooseImages">
+        <view class="add-content">
+          <text class="add-icon">+</text>
+          <text class="add-text">添加图片</text>
+        </view>
+      </view>
+    </view>
+    <view class="image-progress" wx:if="{{imageList.length > 0}}">
+      <view class="progress-bar">
+        <view class="progress-fill" style="width: {{imageList.length / 9 * 100}}%"></view>
+      </view>
+      <text class="image-count">{{imageList.length}} / 9</text>
+    </view>
+  </view>
+
+  <!-- 提交按钮 -->
+  <view class="submit-area">
+    <button
+      class="submit-btn {{submitting ? 'loading' : ''}}"
+      disabled="{{submitting}}"
+      bindtap="onSubmit"
+    >
+      <view class="btn-inner" wx:if="{{!submitting}}">
+        <text class="btn-icon">✨</text>
+        <text>发布游记</text>
+      </view>
+      <view class="btn-inner btn-loading" wx:else>
+        <view class="btn-spinner"></view>
+        <text>发布中...</text>
+      </view>
+    </button>
+  </view>
+
+</view>

@@ -1,0 +1,13 @@
+<view class="page-container">
+  <view class="poster-preview" wx:if="{{posterUrl}}">
+    <image class="poster-image" src="{{posterUrl}}" mode="aspectFit"></image>
+  </view>
+  <view wx:if="{{!posterUrl && !loading}}" class="empty-state">
+    <text>暂无分享内容</text>
+  </view>
+  <view wx:if="{{loading}}" class="loading-state"><text>生成中...</text></view>
+  <view class="action-row">
+    <button class="share-btn" open-type="share">分享给好友</button>
+    <button class="save-btn" bindtap="onSavePoster" wx:if="{{posterUrl}}">保存海报</button>
+  </view>
+</view>

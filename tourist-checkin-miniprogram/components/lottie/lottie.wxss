@@ -1,0 +1,249 @@
+.anim-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.lottie-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* ===== 成就解锁 ===== */
+
+.unlock-ring {
+  position: absolute;
+  width: 60%;
+  height: 60%;
+  border: 4rpx solid var(--primary, #FB7299);
+  border-radius: 50%;
+  opacity: 0.6;
+  animation: ring-expand 1200ms var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)) forwards;
+}
+.unlock-ring.loop { animation-iteration-count: infinite; }
+
+.unlock-star {
+  position: relative;
+  font-size: 80rpx;
+  z-index: 2;
+  animation: star-pop 800ms var(--ease-spring, cubic-bezier(0.175, 0.885, 0.32, 1.275)) forwards;
+}
+.unlock-star.loop { animation-iteration-count: infinite; }
+
+.unlock-sparkle {
+  position: absolute;
+  font-size: 28rpx;
+  z-index: 3;
+}
+.unlock-sparkle.s1 {
+  top: 10%;
+  left: 15%;
+  animation: sparkle-in 600ms 200ms var(--ease-bounce, cubic-bezier(0.34, 1.56, 0.64, 1)) forwards;
+  opacity: 0;
+}
+.unlock-sparkle.s1.loop { animation-iteration-count: infinite; }
+.unlock-sparkle.s2 {
+  top: 15%;
+  right: 15%;
+  animation: sparkle-in 600ms 350ms var(--ease-bounce, cubic-bezier(0.34, 1.56, 0.64, 1)) forwards;
+  opacity: 0;
+}
+.unlock-sparkle.s2.loop { animation-iteration-count: infinite; }
+.unlock-sparkle.s3 {
+  bottom: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: sparkle-in 600ms 500ms var(--ease-bounce, cubic-bezier(0.34, 1.56, 0.64, 1)) forwards;
+  opacity: 0;
+}
+.unlock-sparkle.s3.loop { animation-iteration-count: infinite; }
+
+@keyframes ring-expand {
+  0% { transform: scale(0.3); opacity: 0; }
+  30% { opacity: 0.8; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+@keyframes star-pop {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes sparkle-in {
+  0% { transform: scale(0) rotate(0deg); opacity: 0; }
+  60% { opacity: 1; }
+  100% { transform: scale(1) rotate(180deg); opacity: 1; }
+}
+
+/* ===== 成功对勾 ===== */
+
+.success-circle {
+  position: relative;
+  width: 50%;
+  height: 50%;
+  border-radius: 50%;
+  background: var(--success, #34C759);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  animation: success-pop 600ms var(--ease-spring, cubic-bezier(0.175, 0.885, 0.32, 1.275)) forwards;
+}
+.success-circle.loop { animation-iteration-count: infinite; }
+
+.success-check {
+  color: #fff;
+  font-size: 60rpx;
+  font-weight: 700;
+  animation: check-draw 400ms 300ms ease forwards;
+  opacity: 0;
+}
+.success-circle.loop .success-check { animation-iteration-count: infinite; }
+
+.success-ring {
+  position: absolute;
+  width: 55%;
+  height: 55%;
+  border: 4rpx solid var(--success, #34C759);
+  border-radius: 50%;
+  animation: ring-expand 1000ms var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)) forwards;
+}
+.success-ring.loop { animation-iteration-count: infinite; }
+
+@keyframes success-pop {
+  0% { transform: scale(0); }
+  60% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+@keyframes check-draw {
+  0% { opacity: 0; transform: scale(0.5); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* ===== 空状态 ===== */
+
+.empty-box {
+  position: relative;
+  z-index: 2;
+  animation: float-y 3s ease-in-out infinite;
+}
+
+.empty-emoji-inner {
+  font-size: 80rpx;
+}
+
+.empty-dot {
+  position: absolute;
+  border-radius: 50%;
+  animation: float-y 2.5s ease-in-out infinite;
+}
+.empty-dot.d1 {
+  width: 16rpx;
+  height: 16rpx;
+  background: var(--primary, #FB7299);
+  top: 20%;
+  left: 20%;
+  animation-delay: 0s;
+  opacity: 0.6;
+}
+.empty-dot.d2 {
+  width: 12rpx;
+  height: 12rpx;
+  background: #FF9AB5;
+  top: 30%;
+  right: 20%;
+  animation-delay: 0.5s;
+  opacity: 0.5;
+}
+.empty-dot.d3 {
+  width: 10rpx;
+  height: 10rpx;
+  background: #F97316;
+  bottom: 25%;
+  left: 40%;
+  animation-delay: 1s;
+  opacity: 0.5;
+}
+
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20rpx); }
+}
+
+/* ===== 撒花 ===== */
+
+.confetti {
+  position: absolute;
+  width: 14rpx;
+  height: 22rpx;
+  border-radius: 4rpx;
+  animation: confetti-drop 1500ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+.confetti.loop { animation-iteration-count: infinite; }
+
+.confetti.c1 {
+  background: var(--primary, #FB7299);
+  left: 15%;
+  top: 0;
+  animation-delay: 0ms;
+}
+.confetti.c2 {
+  background: #FFD700;
+  left: 30%;
+  top: 0;
+  animation-delay: 100ms;
+  width: 10rpx;
+  height: 18rpx;
+}
+.confetti.c3 {
+  background: var(--success, #34C759);
+  left: 50%;
+  top: 0;
+  animation-delay: 200ms;
+  border-radius: 50%;
+}
+.confetti.c4 {
+  background: #F97316;
+  left: 65%;
+  top: 0;
+  animation-delay: 150ms;
+}
+.confetti.c5 {
+  background: #5856D6;
+  left: 80%;
+  top: 0;
+  animation-delay: 250ms;
+  width: 10rpx;
+  height: 16rpx;
+}
+.confetti.c6 {
+  background: #00BFFF;
+  left: 45%;
+  top: 0;
+  animation-delay: 300ms;
+  border-radius: 50%;
+}
+
+@keyframes confetti-drop {
+  0% {
+    transform: translateY(-20rpx) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(300rpx) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .unlock-ring, .unlock-star, .unlock-sparkle,
+  .success-circle, .success-check, .success-ring,
+  .empty-box, .empty-dot, .confetti {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+  }
+}

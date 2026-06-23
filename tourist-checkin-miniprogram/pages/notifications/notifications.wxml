@@ -1,0 +1,31 @@
+<view class="page-container">
+  <view class="header-bar">
+    <text class="header-title">消息通知</text>
+    <text class="read-all-btn" bindtap="onReadAll">全部已读</text>
+  </view>
+
+  <view class="notification-list">
+    <view wx:for="{{notifications}}" wx:key="id" class="notification-item {{item.read ? 'read' : 'unread'}}" bindtap="onTapNotification" data-id="{{item.id}}" data-index="{{index}}">
+      <view class="notif-icon-area">
+        <text class="notif-icon">{{item.type === 'LIKE' ? '♥' : (item.type === 'COMMENT' ? '💬' : (item.type === 'FOLLOW' ? '👤' : '🔔'))}}</text>
+      </view>
+      <view class="notif-content">
+        <text class="notif-text">{{item.content}}</text>
+        <text class="notif-time">{{item.timeText}}</text>
+      </view>
+      <view wx:if="{{!item.read}}" class="unread-dot"></view>
+    </view>
+  </view>
+
+  <view wx:if="{{!loading && notifications.length === 0}}" class="empty-state">
+    <text class="empty-text">暂无消息</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-more">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:if="{{!hasMore && notifications.length > 0}}" class="no-more">
+    <text>没有更多了</text>
+  </view>
+</view>

@@ -1,0 +1,13 @@
+<view class="action-bar {{safeArea ? 'safe-area' : ''}}">
+  <view
+    wx:for="{{actions}}"
+    wx:key="type"
+    class="action-btn {{item.active ? 'active' : ''}}"
+    bindtap="onAction"
+    data-type="{{item.type}}"
+  >
+    <text class="action-icon">{{item.icon}}</text>
+    <text class="action-label">{{item.text}}</text>
+    <text wx:if="{{item.count > 0}}" class="action-count">{{item.count}}</text>
+  </view>
+</view>

@@ -24,6 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -76,38 +79,48 @@ public class TravelNoteService {
         return convertToVO(note, userId);
     }
 
+    @Transactional
     public TravelNoteVO detail(Long id, Long currentUserId) {
         TravelNote note = travelNoteMapper.selectById(id);
         if (note == null || note.getStatus() == 0) {
             throw new BadRequestException("游记不存在或已删除");
         }
+        travelNoteMapper.incrementViewCount(id);
         note.setViewCount(note.getViewCount() + 1);
-        travelNoteMapper.updateById(note);
         return convertToVO(note, currentUserId);
     }
 
     public List<TravelNoteVO> listByUser(Long userId) {
-        return travelNoteMapper.selectByUserId(userId).stream()
-                .map(n -> convertToVO(n, userId)).toList();
+        return convertToVOList(travelNoteMapper.selectByUserId(userId), userId);
     }
 
     public List<TravelNoteVO> listHot(int limit) {
-        return travelNoteMapper.selectHot(limit).stream()
-                .map(n -> convertToVO(n, null)).toList();
+        return convertToVOList(travelNoteMapper.selectHot(limit), null);
     }
 
     public List<TravelNoteVO> listRecent(int page, int size) {
+        return listRecent(page, size, null);
+    }
+
+    public List<TravelNoteVO> listRecent(int page, int size, String keyword) {
         LambdaQueryWrapper<TravelNote> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(TravelNote::getStatus, 1)
-               .orderByDesc(TravelNote::getCreatedAt);
+        wrapper.eq(TravelNote::getStatus, 1);
+        if (keyword != null && !keyword.isEmpty()) {
+            wrapper.and(w -> w.like(TravelNote::getTitle, keyword)
+                    .or().like(TravelNote::getContent, keyword)
+                    .or().like(TravelNote::getCity, keyword));
+        }
+        wrapper.orderByDesc(TravelNote::getCreatedAt);
         Page<TravelNote> p = new Page<>(page, size);
-        return travelNoteMapper.selectPage(p, wrapper).getRecords().stream()
-                .map(n -> convertToVO(n, null)).toList();
+        return convertToVOList(travelNoteMapper.selectPage(p, wrapper).getRecords(), null);
     }
 
     public List<TravelNoteVO> getLikedTravelNotes(Long userId) {
-        return travelNoteMapper.selectLikedByUserId(userId).stream()
-                .map(n -> convertToVO(n, userId)).toList();
+        return convertToVOList(travelNoteMapper.selectLikedByUserId(userId), userId);
+    }
+
+    public List<TravelNoteVO> getCollectedTravelNotes(Long userId) {
+        return convertToVOList(travelNoteMapper.selectCollectedByUserId(userId), userId);
     }
 
     @Transactional
@@ -115,24 +128,16 @@ public class TravelNoteService {
         LambdaQueryWrapper<TravelNoteLike> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(TravelNoteLike::getNoteId, noteId)
                .eq(TravelNoteLike::getUserId, userId);
-        if (travelNoteLikeMapper.selectCount(wrapper) > 0) {
-            travelNoteLikeMapper.delete(wrapper);
-            TravelNote note = travelNoteMapper.selectById(noteId);
-            if (note != null && note.getLikeCount() > 0) {
-                note.setLikeCount(note.getLikeCount() - 1);
-                travelNoteMapper.updateById(note);
-            }
+        int deleted = travelNoteLikeMapper.delete(wrapper);
+        if (deleted > 0) {
+            travelNoteMapper.decrementLikeCount(noteId);
         } else {
             try {
                 TravelNoteLike like = new TravelNoteLike();
                 like.setNoteId(noteId);
                 like.setUserId(userId);
                 travelNoteLikeMapper.insert(like);
-                TravelNote note = travelNoteMapper.selectById(noteId);
-                if (note != null) {
-                    note.setLikeCount(note.getLikeCount() + 1);
-                    travelNoteMapper.updateById(note);
-                }
+                travelNoteMapper.incrementLikeCount(noteId);
             } catch (org.springframework.dao.DuplicateKeyException e) {
                 // 并发场景下唯一索引冲突：其他线程已点赞，幂等处理
             }
@@ -146,25 +151,35 @@ public class TravelNoteService {
                .eq(TravelNoteCollect::getUserId, userId);
         if (travelNoteCollectMapper.selectCount(wrapper) > 0) {
             travelNoteCollectMapper.delete(wrapper);
-            TravelNote note = travelNoteMapper.selectById(noteId);
-            if (note != null && note.getCollectCount() > 0) {
-                note.setCollectCount(note.getCollectCount() - 1);
-                travelNoteMapper.updateById(note);
-            }
+            travelNoteMapper.decrementCollectCount(noteId);
         } else {
-            TravelNoteCollect col = new TravelNoteCollect();
-            col.setNoteId(noteId);
-            col.setUserId(userId);
-            travelNoteCollectMapper.insert(col);
-            TravelNote note = travelNoteMapper.selectById(noteId);
-            if (note != null) {
-                note.setCollectCount(note.getCollectCount() + 1);
-                travelNoteMapper.updateById(note);
+            try {
+                TravelNoteCollect col = new TravelNoteCollect();
+                col.setNoteId(noteId);
+                col.setUserId(userId);
+                travelNoteCollectMapper.insert(col);
+                travelNoteMapper.incrementCollectCount(noteId);
+            } catch (org.springframework.dao.DuplicateKeyException e) {
+                // 并发场景下唯一索引冲突：其他线程已收藏，幂等处理
             }
         }
     }
 
     private TravelNoteVO convertToVO(TravelNote n, Long currentUserId) {
+        TravelNoteVO vo = convertToVO(n, currentUserId, Map.of(), Set.of(), Set.of());
+        // 加载游记图片
+        List<TravelNoteImage> images = travelNoteImageMapper.selectList(
+                new LambdaQueryWrapper<TravelNoteImage>()
+                        .eq(TravelNoteImage::getNoteId, n.getId())
+                        .orderByAsc(TravelNoteImage::getSortOrder));
+        vo.setImages(images.stream().map(TravelNoteImage::getUrl).toList());
+        return vo;
+    }
+
+    private TravelNoteVO convertToVO(TravelNote n, Long currentUserId,
+                                      Map<Long, User> userMap,
+                                      Set<Long> likedNoteIds,
+                                      Set<Long> collectedNoteIds) {
         TravelNoteVO vo = new TravelNoteVO();
         vo.setId(n.getId());
         vo.setTitle(n.getTitle());
@@ -178,14 +193,13 @@ public class TravelNoteService {
         vo.setLikeCount(n.getLikeCount());
         vo.setCollectCount(n.getCollectCount());
         vo.setCommentCount(n.getCommentCount());
-        vo.setHasLiked(currentUserId != null && checkLiked(currentUserId, n.getId()));
-        vo.setHasCollected(currentUserId != null && checkCollected(currentUserId, n.getId()));
+        vo.setHasLiked(likedNoteIds.contains(n.getId()));
+        vo.setHasCollected(collectedNoteIds.contains(n.getId()));
         vo.setCreatedAt(n.getCreatedAt());
         vo.setUpdatedAt(n.getUpdatedAt());
 
-        // 设置作者信息
         if (n.getUserId() != null) {
-            User author = userMapper.selectById(n.getUserId());
+            User author = userMap.get(n.getUserId());
             if (author != null) {
                 UserBriefVO authorVO = new UserBriefVO();
                 authorVO.setId(author.getId());
@@ -198,17 +212,94 @@ public class TravelNoteService {
         return vo;
     }
 
-    private boolean checkLiked(Long userId, Long noteId) {
-        LambdaQueryWrapper<TravelNoteLike> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(TravelNoteLike::getNoteId, noteId)
-               .eq(TravelNoteLike::getUserId, userId);
-        return travelNoteLikeMapper.selectCount(wrapper) > 0;
+    private List<TravelNoteVO> convertToVOList(List<TravelNote> notes, Long currentUserId) {
+        if (notes.isEmpty()) return List.of();
+
+        // 批量加载作者信息
+        Set<Long> userIds = notes.stream().map(TravelNote::getUserId).collect(Collectors.toSet());
+        Map<Long, User> userMap = userMapper.selectBatchIds(userIds).stream()
+                .collect(Collectors.toMap(User::getId, u -> u));
+
+        // 批量加载点赞/收藏状态
+        Set<Long> likedNoteIds = Set.of();
+        Set<Long> collectedNoteIds = Set.of();
+        if (currentUserId != null) {
+            List<Long> noteIds = notes.stream().map(TravelNote::getId).toList();
+            likedNoteIds = travelNoteLikeMapper.selectList(
+                    new LambdaQueryWrapper<TravelNoteLike>()
+                            .eq(TravelNoteLike::getUserId, currentUserId)
+                            .in(TravelNoteLike::getNoteId, noteIds))
+                    .stream().map(TravelNoteLike::getNoteId).collect(Collectors.toSet());
+            collectedNoteIds = travelNoteCollectMapper.selectList(
+                    new LambdaQueryWrapper<TravelNoteCollect>()
+                            .eq(TravelNoteCollect::getUserId, currentUserId)
+                            .in(TravelNoteCollect::getNoteId, noteIds))
+                    .stream().map(TravelNoteCollect::getNoteId).collect(Collectors.toSet());
+        }
+
+        // 批量加载游记图片
+        List<Long> noteIds = notes.stream().map(TravelNote::getId).toList();
+        Map<Long, List<String>> imagesMap = travelNoteImageMapper.selectList(
+                new LambdaQueryWrapper<TravelNoteImage>()
+                        .in(TravelNoteImage::getNoteId, noteIds)
+                        .orderByAsc(TravelNoteImage::getSortOrder))
+                .stream().collect(Collectors.groupingBy(
+                        TravelNoteImage::getNoteId,
+                        Collectors.mapping(TravelNoteImage::getUrl, Collectors.toList())));
+
+        Map<Long, User> finalUserMap = userMap;
+        Set<Long> finalLikedNoteIds = likedNoteIds;
+        Set<Long> finalCollectedNoteIds = collectedNoteIds;
+        return notes.stream()
+                .map(n -> {
+                    TravelNoteVO vo = convertToVO(n, currentUserId, finalUserMap, finalLikedNoteIds, finalCollectedNoteIds);
+                    vo.setImages(imagesMap.getOrDefault(n.getId(), List.of()));
+                    return vo;
+                })
+                .toList();
     }
 
-    private boolean checkCollected(Long userId, Long noteId) {
-        LambdaQueryWrapper<TravelNoteCollect> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(TravelNoteCollect::getNoteId, noteId)
-               .eq(TravelNoteCollect::getUserId, userId);
-        return travelNoteCollectMapper.selectCount(wrapper) > 0;
+    // ==================== 管理员功能 ====================
+
+    public Map<String, Object> adminList(int page, int size, Integer status, String keyword) {
+        LambdaQueryWrapper<TravelNote> wrapper = new LambdaQueryWrapper<>();
+        if (status != null) {
+            wrapper.eq(TravelNote::getStatus, status);
+        }
+        if (keyword != null && !keyword.isEmpty()) {
+            wrapper.and(w -> w.like(TravelNote::getTitle, keyword).or().like(TravelNote::getCity, keyword));
+        }
+        wrapper.orderByDesc(TravelNote::getCreatedAt);
+        Page<TravelNote> p = new Page<>(page, size);
+        Page<TravelNote> result = travelNoteMapper.selectPage(p, wrapper);
+
+        Map<String, Object> map = new java.util.HashMap<>();
+        map.put("list", result.getRecords().stream().map(n -> convertToVO(n, null)).toList());
+        map.put("total", result.getTotal());
+        return map;
+    }
+
+    @Transactional
+    public void adminAudit(Long id, int status) {
+        TravelNote note = travelNoteMapper.selectById(id);
+        if (note == null) throw new BadRequestException("游记不存在");
+        note.setStatus(status);
+        travelNoteMapper.updateById(note);
+    }
+
+    @Transactional
+    public void adminDelete(Long id) {
+        TravelNote note = travelNoteMapper.selectById(id);
+        if (note == null) throw new BadRequestException("游记不存在");
+        note.setStatus(0);
+        travelNoteMapper.updateById(note);
+    }
+
+    @Transactional
+    public void adminTogglePin(Long id) {
+        TravelNote note = travelNoteMapper.selectById(id);
+        if (note == null) throw new BadRequestException("游记不存在");
+        note.setIsPinned(note.getIsPinned() == 1 ? 0 : 1);
+        travelNoteMapper.updateById(note);
     }
 }

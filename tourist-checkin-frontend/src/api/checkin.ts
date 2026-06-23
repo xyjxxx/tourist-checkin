@@ -35,6 +35,10 @@ export const getAllCheckIns = (): Promise<ApiResponse<CheckIn[]>> => {
   return request.get('/checkin/admin/all')
 }
 
+export const getCheckInPage = (page: number, size: number, keyword?: string): Promise<ApiResponse<{ list: CheckIn[], total: number }>> => {
+  return request.get('/checkin/admin/page', { params: { page, size, keyword } })
+}
+
 export const adminDeleteCheckIn = (checkInId: number): Promise<ApiResponse<void>> => {
   return request.delete(`/checkin/admin/${checkInId}`)
 }

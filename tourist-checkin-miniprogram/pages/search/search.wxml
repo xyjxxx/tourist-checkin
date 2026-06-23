@@ -1,0 +1,50 @@
+<view class="page-container">
+  <view class="search-bar">
+    <view class="search-input-wrap">
+      <text class="search-icon">🔍</text>
+      <input class="search-input" placeholder="搜索游记、用户、地点..." value="{{keyword}}" bindinput="onInput" bindconfirm="onSearch" focus="{{true}}" />
+      <text wx:if="{{keyword}}" class="clear-btn" bindtap="onClear">✕</text>
+    </view>
+    <text class="cancel-btn" bindtap="onCancel">取消</text>
+  </view>
+
+  <!-- Search history -->
+  <view wx:if="{{!keyword && history.length > 0}}" class="section">
+    <view class="section-header">
+      <text class="section-title">搜索历史</text>
+      <text class="clear-history" bindtap="onClearHistory">清空</text>
+    </view>
+    <view class="history-tags">
+      <view wx:for="{{history}}" wx:key="*this" class="history-tag" bindtap="onTapHistory" data-keyword="{{item}}">
+        <text>{{item}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Results -->
+  <view wx:if="{{searching || hasSearched}}">
+    <!-- Notes results -->
+    <view wx:if="{{notes.length > 0}}" class="section">
+      <text class="section-title">游记</text>
+      <view wx:for="{{notes}}" wx:key="id" class="note-item" bindtap="onTapNote" data-id="{{item.id}}">
+        <image class="note-cover" src="{{item.coverImage}}" mode="aspectFill"></image>
+        <view class="note-info">
+          <text class="note-title">{{item.title}}</text>
+          <text class="note-author">{{item.authorName}}</text>
+        </view>
+      </view>
+    </view>
+    <!-- Topics results -->
+    <view wx:if="{{topics.length > 0}}" class="section">
+      <text class="section-title">话题</text>
+      <view wx:for="{{topics}}" wx:key="id" class="topic-item" bindtap="onTapTopic" data-name="{{item.name}}">
+        <text class="topic-hash">#</text>
+        <text class="topic-name">{{item.name}}</text>
+      </view>
+    </view>
+    <view wx:if="{{notes.length === 0 && topics.length === 0}}" class="empty-state">
+      <text class="empty-icon">🔍</text>
+      <text class="empty-text">未找到相关结果</text>
+    </view>
+  </view>
+</view>

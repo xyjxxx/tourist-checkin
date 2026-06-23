@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "打卡",
+  "usingComponents": {
+    "lottie": "/components/lottie/lottie"
+  }
+}

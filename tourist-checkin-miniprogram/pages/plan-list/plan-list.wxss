@@ -1,0 +1,136 @@
+.page-container {
+  background-color: var(--bg);
+  min-height: 100vh;
+  position: relative;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.tabs {
+  display: flex;
+  flex-direction: row;
+  background-color: var(--white);
+  padding: 0 var(--space-md);
+  border-bottom: 1rpx solid var(--bg);
+}
+
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: var(--space-md) 0;
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  position: relative;
+  min-height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-item.active {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48rpx;
+  height: 4rpx;
+  background-color: var(--primary);
+  border-radius: 2rpx;
+}
+
+.plan-list {
+  padding: var(--space-sm) var(--space-md);
+}
+
+.plan-item {
+  background-color: var(--white);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+
+.plan-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-12);
+}
+
+.plan-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.plan-city {
+  font-size: 24rpx;
+  color: var(--primary);
+  background-color: var(--primary-light);
+  padding: 4rpx var(--space-sm);
+  border-radius: var(--radius-sm);
+  margin-left: var(--space-sm);
+}
+
+.plan-meta {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.plan-dates {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+.plan-days {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 100rpx 0;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+}
+
+.loading-more {
+  text-align: center;
+  padding: var(--space-md) 0;
+  font-size: 26rpx;
+  color: var(--text-secondary);
+}
+
+.fab-btn {
+  position: fixed;
+  right: 40rpx;
+  bottom: 40rpx;
+  width: 100rpx;
+  height: 100rpx;
+  background-color: var(--primary);
+  border-radius: 50rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  min-height: 88rpx;
+}
+
+.fab-icon {
+  font-size: var(--space-xl);
+  color: var(--white);
+}

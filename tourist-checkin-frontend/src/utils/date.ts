@@ -1,7 +1,4 @@
 import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
-
-dayjs.extend(relativeTime)
 
 /**
  * 安全格式化时间 - 处理null/undefined情况

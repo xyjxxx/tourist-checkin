@@ -1,5 +1,7 @@
 package com.travel.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.travel.dto.TripDayDTO;
 import com.travel.dto.TripPlanCreateDTO;
 import com.travel.dto.TripPOIDTO;
@@ -21,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +45,7 @@ public class TripPlanService {
         plan.setStartDate(dto.getStartDate());
         plan.setEndDate(dto.getEndDate());
         plan.setTotalDays(dto.getDays() != null ? dto.getDays().size() : 0);
-        plan.setIsPublic(dto.getIsPublic() != null ? 1 : 0);
+        plan.setIsPublic(Boolean.TRUE.equals(dto.getIsPublic()) ? 1 : 0);
         plan.setStatus(1);
         tripPlanMapper.insert(plan);
 
@@ -90,7 +94,9 @@ public class TripPlanService {
     }
 
     public List<TripPlanBriefVO> listPublic(int page, int size) {
-        return tripPlanMapper.selectPublic(size).stream()
+        if (page < 1) page = 1;
+        int offset = (page - 1) * size;
+        return tripPlanMapper.selectPublic(offset, size).stream()
                 .map(this::convertToBriefVO).toList();
     }
 
@@ -118,7 +124,13 @@ public class TripPlanService {
         vo.setStatus(plan.getStatus());
         vo.setCreatedAt(plan.getCreatedAt());
 
+        // 批量加载天数（2条SQL代替1+N条）
         List<TripDay> days = tripDayMapper.selectByPlanId(plan.getId());
+        List<Long> dayIds = days.stream().map(TripDay::getId).toList();
+        Map<Long, List<TripPOI>> poisByDay = dayIds.isEmpty() ? Map.of() :
+                tripPOIMapper.selectByDayIds(dayIds).stream()
+                        .collect(Collectors.groupingBy(TripPOI::getDayId));
+
         vo.setDays(days.stream().map(day -> {
             TripDayVO dayVO = new TripDayVO();
             dayVO.setId(day.getId());
@@ -126,8 +138,7 @@ public class TripPlanService {
             dayVO.setTitle(day.getTitle());
             dayVO.setDate(day.getDate());
 
-            List<TripPOI> pois = tripPOIMapper.selectByDayId(day.getId());
-            dayVO.setPois(pois.stream().map(poi -> {
+            dayVO.setPois(poisByDay.getOrDefault(day.getId(), List.of()).stream().map(poi -> {
                 TripPOIVO poiVO = new TripPOIVO();
                 poiVO.setId(poi.getId());
                 poiVO.setName(poi.getName());
@@ -144,6 +155,32 @@ public class TripPlanService {
         }).toList());
 
         return vo;
+    }
+
+    // ==================== 管理员功能 ====================
+
+    public Map<String, Object> adminList(int page, int size, String keyword) {
+        if (page < 1) page = 1;
+        LambdaQueryWrapper<TripPlan> wrapper = new LambdaQueryWrapper<>();
+        wrapper.ne(TripPlan::getStatus, 0);
+        if (keyword != null && !keyword.isEmpty()) {
+            wrapper.and(w -> w.like(TripPlan::getTitle, keyword).or().like(TripPlan::getCity, keyword));
+        }
+        wrapper.orderByDesc(TripPlan::getCreatedAt);
+        Page<TripPlan> p = new Page<>(page, size);
+        Page<TripPlan> result = tripPlanMapper.selectPage(p, wrapper);
+
+        Map<String, Object> map = new java.util.HashMap<>();
+        map.put("list", result.getRecords().stream().map(this::convertToBriefVO).toList());
+        map.put("total", result.getTotal());
+        return map;
+    }
+
+    public void adminDelete(Long planId) {
+        TripPlan plan = tripPlanMapper.selectById(planId);
+        if (plan == null) throw new BadRequestException("行程不存在");
+        plan.setStatus(0);
+        tripPlanMapper.updateById(plan);
     }
 
     private TripPlanBriefVO convertToBriefVO(TripPlan plan) {

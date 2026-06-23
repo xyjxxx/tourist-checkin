@@ -2,13 +2,11 @@ package com.travel.service;
 
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.travel.dto.CheckInDTO;
-import com.travel.entity.CheckIn;
-import com.travel.entity.CheckInLike;
-import com.travel.entity.User;
+import com.travel.entity.*;
 import com.travel.exception.UnauthorizedException;
-import com.travel.mapper.CheckInLikeMapper;
-import com.travel.mapper.CheckInMapper;
+import com.travel.mapper.*;
 import com.travel.utils.AchievementUtil;
 import com.travel.utils.NotificationUtil;
 import com.travel.utils.PointUtil;
@@ -29,6 +27,8 @@ public class CheckInService {
 
     private final CheckInMapper checkInMapper;
     private final CheckInLikeMapper checkInLikeMapper;
+    private final CommentMapper commentMapper;
+    private final CheckInTopicMapper checkInTopicMapper;
     private final com.travel.mapper.UserMapper userMapper;
     private final TopicService topicService;
     private final PointUtil pointUtil;
@@ -53,7 +53,7 @@ public class CheckInService {
 
         // 关联话题
         if (dto.getTopicIds() != null && !dto.getTopicIds().isEmpty()) {
-            topicService.attachToCheckIn(checkIn.getId(), dto.getTopicIds());
+            topicService.attachToCheckIn(userId, checkIn.getId(), dto.getTopicIds());
         }
 
         // 奖励积分
@@ -74,8 +74,22 @@ public class CheckInService {
         return checkInMapper.selectByUserId(userId, currentUserId);
     }
 
+    public CheckInVO getDetailById(Long id, Long currentUserId) {
+        return checkInMapper.selectDetailById(id, currentUserId);
+    }
+
     public List<CheckInVO> listRecent(Long userId) {
         return checkInMapper.selectRecent(userId);
+    }
+
+    public List<CheckInVO> listFollowing(Long userId, int page, int size) {
+        if (page < 1) page = 1;
+        int offset = (page - 1) * size;
+        return checkInMapper.selectFollowing(userId, offset, size);
+    }
+
+    public List<CheckInVO> listHotThisMonth(Long userId, int limit) {
+        return checkInMapper.selectHotThisMonth(userId, limit);
     }
 
     @Transactional
@@ -87,6 +101,9 @@ public class CheckInService {
         if (checkInLikeMapper.selectCount(wrapper) > 0) {
             // 已点赞，执行取消点赞
             checkInLikeMapper.delete(wrapper);
+            checkInMapper.update(null, new LambdaUpdateWrapper<CheckIn>()
+                    .eq(CheckIn::getId, checkInId)
+                    .setSql("like_count = like_count - 1"));
         } else {
             // 未点赞，执行点赞（捕获并发唯一索引冲突，实现幂等）
             try {
@@ -94,6 +111,9 @@ public class CheckInService {
                 like.setCheckInId(checkInId);
                 like.setUserId(userId);
                 checkInLikeMapper.insert(like);
+                checkInMapper.update(null, new LambdaUpdateWrapper<CheckIn>()
+                        .eq(CheckIn::getId, checkInId)
+                        .setSql("like_count = like_count + 1"));
 
                 // 点赞通知
                 CheckIn checkIn = checkInMapper.selectById(checkInId);
@@ -118,11 +138,22 @@ public class CheckInService {
         if (checkIn == null || !checkIn.getUserId().equals(userId)) {
             throw new UnauthorizedException("无权删除此打卡记录");
         }
-        checkInMapper.deleteById(checkInId);
+        cascadeDeleteCheckIn(checkInId);
     }
 
     public List<CheckInVO> getAllCheckIns(Long currentUserId) {
-        return checkInMapper.selectAllCheckIns(currentUserId);
+        return checkInMapper.selectAllCheckIns(currentUserId, 200);
+    }
+
+    public java.util.Map<String, Object> getCheckInPage(String keyword, int page, int size) {
+        if (page < 1) page = 1;
+        int offset = (page - 1) * size;
+        List<CheckInVO> list = checkInMapper.selectPage(keyword, offset, size);
+        long total = checkInMapper.selectPageCount(keyword);
+        java.util.Map<String, Object> result = new java.util.HashMap<>();
+        result.put("list", list);
+        result.put("total", total);
+        return result;
     }
 
     public List<CheckInVO> getLikedCheckIns(Long userId) {
@@ -131,14 +162,17 @@ public class CheckInService {
 
     public CheckInStatsVO getCheckInStats() {
         CheckInStatsVO stats = new CheckInStatsVO();
-        stats.setTotalCheckIns(checkInMapper.selectCount(null));
+        stats.setTotalCheckIns(checkInMapper.selectCount(
+                new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<CheckIn>().eq(CheckIn::getDeleted, 0)));
         stats.setTodayCheckIns(checkInMapper.selectTodayCount());
         stats.setTotalLikes(checkInLikeMapper.selectCount(null));
+        stats.setTotalUsers(checkInMapper.selectDistinctUserCount());
+        stats.setTotalLocations(checkInMapper.selectDistinctLocationCount());
         return stats;
     }
 
+    @Transactional
     public void adminDeleteCheckIn(Long adminUserId, Long checkInId) {
-        // Defense in depth：即使 JwtInterceptor 已拦截，Service 层再次校验管理员身份
         User admin = userMapper.selectById(adminUserId);
         if (admin == null || (!"ADMIN".equals(admin.getRole()) && !"SUPER_ADMIN".equals(admin.getRole()))) {
             throw new UnauthorizedException("无权访问");
@@ -147,6 +181,17 @@ public class CheckInService {
         if (checkIn == null) {
             throw new com.travel.exception.BadRequestException("打卡记录不存在");
         }
+        cascadeDeleteCheckIn(checkInId);
+    }
+
+    private void cascadeDeleteCheckIn(Long checkInId) {
+        // 级联清理关联数据
+        checkInLikeMapper.delete(new LambdaQueryWrapper<CheckInLike>().eq(CheckInLike::getCheckInId, checkInId));
+        // 评论使用软删除（status=0），与其他删除路径保持一致
+        Comment commentUpdate = new Comment();
+        commentUpdate.setStatus(0);
+        commentMapper.update(commentUpdate, new LambdaQueryWrapper<Comment>().eq(Comment::getCheckInId, checkInId));
+        checkInTopicMapper.delete(new LambdaQueryWrapper<CheckInTopic>().eq(CheckInTopic::getCheckInId, checkInId));
         checkInMapper.deleteById(checkInId);
     }
 }

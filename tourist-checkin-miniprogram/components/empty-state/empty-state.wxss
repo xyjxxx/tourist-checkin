@@ -1,0 +1,33 @@
+.empty-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx var(--space-lg);
+}
+
+.empty-icon {
+  font-size: 96rpx;
+  margin-bottom: var(--space-md);
+  opacity: 0.6;
+}
+
+.empty-title {
+  font-size: 30rpx;
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-bottom: var(--space-xs);
+}
+
+.empty-subtitle {
+  font-size: 26rpx;
+  color: var(--text-tertiary);
+  text-align: center;
+  max-width: 480rpx;
+  line-height: 1.5;
+  margin-bottom: var(--space-lg);
+}
+
+.empty-action {
+  margin-top: var(--space-md);
+}

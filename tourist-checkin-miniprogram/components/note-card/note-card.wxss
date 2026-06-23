@@ -1,0 +1,83 @@
+.card-container {
+  background-color: var(--white);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  margin-bottom: var(--space-sm);
+  box-shadow: var(--shadow-card);
+  transition: transform var(--anim-fast) var(--ease-out), box-shadow var(--anim-fast) ease;
+}
+
+.card-container:active {
+  transform: scale(0.97);
+  box-shadow: var(--shadow-sm);
+}
+
+.cover-image {
+  width: 100%;
+  height: 300rpx;
+  display: block;
+  background: var(--bg);
+}
+
+.card-body {
+  padding: var(--space-20);
+}
+
+.note-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: var(--space-12);
+  display: block;
+  line-height: 1.3;
+}
+
+.author-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: var(--space-12);
+  gap: var(--space-xs);
+}
+
+.author-avatar {
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 50%;
+  background: var(--bg);
+}
+
+.author-name {
+  font-size: 22rpx;
+  color: var(--text-secondary);
+}
+
+.card-footer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.city-tag {
+  font-size: 20rpx;
+  color: var(--primary-dark);
+  background: var(--primary-light);
+  padding: 6rpx 14rpx;
+  border-radius: var(--radius-full);
+  font-weight: 500;
+}
+
+.stats {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-sm);
+}
+
+.stat {
+  font-size: 22rpx;
+  color: var(--text-tertiary);
+}

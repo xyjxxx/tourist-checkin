@@ -1,0 +1,137 @@
+.page-container {
+  background-color: var(--bg);
+  min-height: 100vh;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.category-tabs {
+  background-color: var(--white);
+  padding: var(--space-sm) 0;
+  margin-bottom: var(--space-sm);
+}
+
+.tabs-scroll {
+  white-space: nowrap;
+  padding: 0 var(--space-md);
+}
+
+.tab-item {
+  display: inline-block;
+  padding: var(--space-12) var(--space-lg);
+  margin-right: var(--space-sm);
+  border-radius: var(--radius-full);
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  background-color: var(--bg);
+}
+
+.tab-item.active {
+  background-color: var(--primary);
+  color: var(--white);
+}
+
+.merchant-list {
+  padding: 0 var(--space-md);
+}
+
+.merchant-card {
+  display: flex;
+  flex-direction: row;
+  background-color: var(--white);
+  border-radius: var(--radius-lg);
+  padding: var(--space-20);
+  margin-bottom: var(--space-sm);
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.merchant-left {
+  margin-right: var(--space-sm);
+  flex-shrink: 0;
+}
+
+.merchant-img {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: var(--radius-md);
+  background-color: var(--bg);
+}
+
+.merchant-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.merchant-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.merchant-tags {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-12);
+  margin-top: var(--space-xs);
+}
+
+.category-tag {
+  font-size: 22rpx;
+  color: var(--primary);
+  background-color: var(--primary-light);
+  padding: 4rpx var(--space-12);
+  border-radius: var(--radius-sm);
+}
+
+.price-tag {
+  font-size: 22rpx;
+  color: #E6A23C;
+  background-color: #FDF6EC;
+  padding: 4rpx var(--space-12);
+  border-radius: var(--radius-sm);
+}
+
+.merchant-meta {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: var(--space-xs);
+}
+
+.rating {
+  font-size: 24rpx;
+  color: var(--text);
+  margin-right: var(--space-20);
+}
+
+.distance {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 100rpx 0;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  display: block;
+  margin-bottom: var(--space-sm);
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+}
+
+.loading-more {
+  text-align: center;
+  padding: var(--space-md) 0;
+  font-size: 26rpx;
+  color: var(--text-secondary);
+}

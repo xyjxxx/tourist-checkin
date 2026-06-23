@@ -1,0 +1,35 @@
+<view class="page-container">
+  <view class="tabs">
+    <view class="tab-item {{activeTab === 'my' ? 'active' : ''}}" bindtap="onTabChange" data-tab="my">
+      <text>我的</text>
+    </view>
+    <view class="tab-item {{activeTab === 'public' ? 'active' : ''}}" bindtap="onTabChange" data-tab="public">
+      <text>公开</text>
+    </view>
+  </view>
+
+  <view class="plan-list">
+    <view wx:for="{{planList}}" wx:key="id" class="plan-item" bindtap="onTapPlan" data-id="{{item.id}}">
+      <view class="plan-header">
+        <text class="plan-title">{{item.title}}</text>
+        <text class="plan-city">{{item.city}}</text>
+      </view>
+      <view class="plan-meta">
+        <text class="plan-dates">{{item.startDate}} ~ {{item.endDate}}</text>
+        <text class="plan-days">共{{item.totalDays}}天</text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{!loading && planList.length === 0}}" class="empty-state">
+    <text class="empty-text">暂无行程</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-more">
+    <text>加载中...</text>
+  </view>
+
+  <view class="fab-btn" bindtap="onCreatePlan">
+    <text class="fab-icon">+</text>
+  </view>
+</view>

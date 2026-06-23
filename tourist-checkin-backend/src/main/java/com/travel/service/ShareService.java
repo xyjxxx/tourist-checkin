@@ -1,5 +1,7 @@
 package com.travel.service;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
 import com.travel.dto.PosterGenDTO;
 import com.travel.entity.CheckIn;
 import com.travel.mapper.CheckInMapper;
@@ -7,6 +9,7 @@ import com.travel.utils.QrCodeUtil;
 import com.travel.vo.CheckInVO;
 import com.travel.vo.PosterVO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,29 +17,41 @@ import org.springframework.stereotype.Service;
 public class ShareService {
 
     private final CheckInMapper checkInMapper;
-    private final QrCodeUtil qrCodeUtil;
+
+    @Value("${app.share-domain:https://travel.app}")
+    private String shareDomain;
 
     public PosterVO generatePoster(Long checkInId, PosterGenDTO dto) {
         CheckIn checkIn = checkInMapper.selectById(checkInId);
         if (checkIn == null) {
-            throw new RuntimeException("打卡记录不存在");
+            throw new com.travel.exception.BadRequestException("打卡记录不存在");
         }
 
         PosterVO poster = new PosterVO();
         poster.setCheckInId(checkInId);
         poster.setLocationName(checkIn.getLocationName());
         poster.setContent(checkIn.getContent());
-        poster.setImageUrl(checkIn.getImages() != null && !checkIn.getImages().isEmpty()
-                ? checkIn.getImages().split(",")[0] : null);
+        String firstImage = null;
+        if (checkIn.getImages() != null && !checkIn.getImages().isEmpty()) {
+            try {
+                JSONArray arr = JSON.parseArray(checkIn.getImages());
+                if (arr != null && !arr.isEmpty()) {
+                    firstImage = arr.getString(0);
+                }
+            } catch (Exception e) {
+                firstImage = checkIn.getImages().split(",")[0];
+            }
+        }
+        poster.setImageUrl(firstImage);
         poster.setCheckInTime(checkIn.getCheckInTime());
 
-        String qrUrl = "https://travel.app/checkin/" + checkInId;
-        poster.setQrCode(qrCodeUtil.generateBase64QrCode(qrUrl, 200, 200));
+        String qrUrl = shareDomain + "/checkin/" + checkInId;
+        poster.setQrCode(QrCodeUtil.generateBase64QrCode(qrUrl, 200, 200));
 
         return poster;
     }
 
     public String getShareLink(Long checkInId) {
-        return "https://travel.app/share/checkin/" + checkInId;
+        return shareDomain + "/share/checkin/" + checkInId;
     }
 }

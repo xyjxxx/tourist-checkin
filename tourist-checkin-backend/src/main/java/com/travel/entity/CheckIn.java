@@ -29,6 +29,8 @@ public class CheckIn {
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime checkInTime;
 
+    private Integer likeCount;
+
     @TableLogic
     private Integer deleted;
 }

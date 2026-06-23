@@ -3,7 +3,9 @@ package com.travel.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.travel.entity.Follow;
 import com.travel.exception.BadRequestException;
+import com.travel.entity.User;
 import com.travel.mapper.FollowMapper;
+import com.travel.mapper.UserMapper;
 import com.travel.utils.NotificationUtil;
 import com.travel.utils.PointUtil;
 import com.travel.vo.UserBriefVO;
@@ -12,13 +14,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.dao.DuplicateKeyException;
+
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class FollowService {
 
     private final FollowMapper followMapper;
+    private final UserMapper userMapper;
     private final NotificationUtil notificationUtil;
     private final PointUtil pointUtil;
 
@@ -33,20 +40,23 @@ public class FollowService {
 
         Follow follow = followMapper.selectOne(wrapper);
         if (follow == null) {
-            follow = new Follow();
-            follow.setFollowerId(followerId);
-            follow.setFolloweeId(followeeId);
-            follow.setStatus(1);
-            followMapper.insert(follow);
+            try {
+                follow = new Follow();
+                follow.setFollowerId(followerId);
+                follow.setFolloweeId(followeeId);
+                follow.setStatus(1);
+                followMapper.insert(follow);
+                notificationUtil.createAndPush(followeeId, followerId,
+                        "FOLLOW", "USER", followerId, "关注了你");
+                pointUtil.addPoints(followerId, "FOLLOW", PointUtil.POINTS_FOLLOW,
+                        "关注用户", "FOLLOW", followeeId);
+            } catch (DuplicateKeyException e) {
+                // 并发关注导致唯一索引冲突，忽略（幂等处理）
+            }
         } else if (follow.getStatus() == 0) {
             follow.setStatus(1);
             followMapper.updateById(follow);
         }
-
-        notificationUtil.createAndPush(followeeId, followerId,
-                "FOLLOW", "USER", followerId, "关注了你");
-        pointUtil.addPoints(followerId, "FOLLOW", PointUtil.POINTS_FOLLOW,
-                "关注用户", "FOLLOW", followeeId);
     }
 
     @Transactional
@@ -66,24 +76,43 @@ public class FollowService {
     }
 
     public List<FollowVO> getFollowers(Long userId) {
-        return followMapper.selectFollowers(userId).stream()
+        List<Follow> follows = followMapper.selectFollowers(userId);
+        Map<Long, User> userMap = batchGetUsers(follows.stream().map(Follow::getFollowerId).toList());
+        return follows.stream()
                 .map(f -> {
                     FollowVO vo = new FollowVO();
-                    UserBriefVO user = new UserBriefVO();
-                    user.setId(f.getFollowerId());
-                    vo.setUser(user);
+                    UserBriefVO userVO = toBriefVO(f.getFollowerId(), userMap);
+                    vo.setUser(userVO);
                     return vo;
                 }).toList();
     }
 
     public List<FollowVO> getFollowing(Long userId) {
-        return followMapper.selectFollowing(userId).stream()
+        List<Follow> follows = followMapper.selectFollowing(userId);
+        Map<Long, User> userMap = batchGetUsers(follows.stream().map(Follow::getFolloweeId).toList());
+        return follows.stream()
                 .map(f -> {
                     FollowVO vo = new FollowVO();
-                    UserBriefVO user = new UserBriefVO();
-                    user.setId(f.getFolloweeId());
-                    vo.setUser(user);
+                    UserBriefVO userVO = toBriefVO(f.getFolloweeId(), userMap);
+                    vo.setUser(userVO);
                     return vo;
                 }).toList();
+    }
+
+    private Map<Long, User> batchGetUsers(List<Long> userIds) {
+        if (userIds.isEmpty()) return Map.of();
+        return userMapper.selectBatchIds(userIds).stream()
+                .collect(Collectors.toMap(User::getId, u -> u));
+    }
+
+    private UserBriefVO toBriefVO(Long userId, Map<Long, User> userMap) {
+        UserBriefVO vo = new UserBriefVO();
+        vo.setId(userId);
+        User user = userMap.get(userId);
+        if (user != null) {
+            vo.setUsername(user.getUsername());
+            vo.setAvatar(user.getAvatar());
+        }
+        return vo;
     }
 }

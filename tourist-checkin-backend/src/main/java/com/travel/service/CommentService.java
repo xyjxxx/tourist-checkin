@@ -7,6 +7,8 @@ import com.travel.entity.Comment;
 import com.travel.entity.CommentLike;
 import com.travel.exception.BadRequestException;
 import com.travel.exception.UnauthorizedException;
+import com.travel.entity.CheckIn;
+import com.travel.mapper.CheckInMapper;
 import com.travel.mapper.CommentLikeMapper;
 import com.travel.mapper.CommentMapper;
 import com.travel.utils.NotificationUtil;
@@ -17,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -27,6 +30,7 @@ public class CommentService {
 
     private final CommentMapper commentMapper;
     private final CommentLikeMapper commentLikeMapper;
+    private final CheckInMapper checkInMapper;
     private final SensitiveWordUtil sensitiveWordUtil;
     private final NotificationUtil notificationUtil;
     private final PointUtil pointUtil;
@@ -40,6 +44,7 @@ public class CommentService {
 
         Comment comment = new Comment();
         comment.setCheckInId(dto.getCheckInId());
+        comment.setNoteId(dto.getNoteId());
         comment.setUserId(userId);
         comment.setParentId(dto.getParentId());
         comment.setReplyToId(dto.getReplyToId());
@@ -53,10 +58,12 @@ public class CommentService {
         if (dto.getReplyToUserId() != null) {
             notificationUtil.createAndPush(dto.getReplyToUserId(), userId,
                     "REPLY", "COMMENT", comment.getId(), "回复了你的评论");
-        } else {
-            // 通知打卡作者（通过关联查询获取）
-            notificationUtil.createAndPush(dto.getCheckInId(), userId,
-                    "COMMENT", "CHECK_IN", dto.getCheckInId(), "评论了你的打卡");
+        } else if (dto.getCheckInId() != null) {
+            CheckIn checkIn = checkInMapper.selectById(dto.getCheckInId());
+            if (checkIn != null && !checkIn.getUserId().equals(userId)) {
+                notificationUtil.createAndPush(checkIn.getUserId(), userId,
+                        "COMMENT", "CHECK_IN", dto.getCheckInId(), "评论了你的打卡");
+            }
         }
 
         // 积分
@@ -67,18 +74,26 @@ public class CommentService {
     }
 
     public List<CommentVO> pageByCheckIn(Long checkInId, Long currentUserId, int page, int size) {
-        List<CommentVO> all = commentMapper.selectByCheckInId(checkInId, currentUserId);
-        // 构建树形结构：顶级评论 + 嵌套回复
-        Map<Long, List<CommentVO>> childrenMap = all.stream()
-                .filter(c -> c.getParentId() != null)
-                .collect(Collectors.groupingBy(CommentVO::getParentId));
+        if (checkInId == null) return List.of();
+        if (page < 1) page = 1;
+        int offset = (page - 1) * size;
+        List<CommentVO> topComments = commentMapper.selectTopLevelByCheckInId(checkInId, offset, size);
+        for (CommentVO top : topComments) {
+            List<CommentVO> replies = commentMapper.selectRepliesByParentId(top.getId());
+            top.setReplies(replies);
+        }
+        return topComments;
+    }
 
-        return all.stream()
-                .filter(c -> c.getParentId() == null)
-                .peek(c -> c.setReplies(childrenMap.getOrDefault(c.getId(), List.of())))
-                .skip((long) (page - 1) * size)
-                .limit(size)
-                .collect(Collectors.toList());
+    public List<CommentVO> pageByNote(Long noteId, Long currentUserId, int page, int size) {
+        if (page < 1) page = 1;
+        int offset = (page - 1) * size;
+        List<CommentVO> topComments = commentMapper.selectTopLevelByNoteId(noteId, offset, size);
+        for (CommentVO top : topComments) {
+            List<CommentVO> replies = commentMapper.selectRepliesByParentId(top.getId());
+            top.setReplies(replies);
+        }
+        return topComments;
     }
 
     @Transactional
@@ -115,10 +130,38 @@ public class CommentService {
         commentMapper.updateById(comment);
     }
 
+    // ==================== 管理员功能 ====================
+
+    public Map<String, Object> adminList(int page, int size) {
+        if (page < 1) page = 1;
+        LambdaQueryWrapper<Comment> wrapper = new LambdaQueryWrapper<>();
+        wrapper.ne(Comment::getStatus, 0)
+               .orderByDesc(Comment::getCreatedAt);
+        Page<Comment> p = new Page<>(page, size);
+        Page<Comment> result = commentMapper.selectPage(p, wrapper);
+
+        Map<String, Object> map = new java.util.HashMap<>();
+        map.put("list", result.getRecords().stream().map(c -> convertToVO(c, null)).toList());
+        map.put("total", result.getTotal());
+        return map;
+    }
+
+    @Transactional
+    public void adminDelete(Long commentId) {
+        Comment comment = commentMapper.selectById(commentId);
+        if (comment == null) throw new BadRequestException("评论不存在");
+        comment.setStatus(0);
+        commentMapper.updateById(comment);
+    }
+
     private CommentVO convertToVO(Comment c, Long currentUserId) {
-        CommentVO vo = new CommentVO();
+        CommentVO vo = commentMapper.selectVOById(c.getId());
+        if (vo != null) return vo;
+        // fallback
+        vo = new CommentVO();
         vo.setId(c.getId());
         vo.setCheckInId(c.getCheckInId());
+        vo.setNoteId(c.getNoteId());
         vo.setContent(c.getContent());
         vo.setLikeCount(c.getLikeCount());
         vo.setStatus(c.getStatus());

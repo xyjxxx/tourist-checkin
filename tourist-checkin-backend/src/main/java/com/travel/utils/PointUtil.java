@@ -6,9 +6,11 @@ import com.travel.entity.UserPoint;
 import com.travel.mapper.PointRecordMapper;
 import com.travel.mapper.UserPointMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class PointUtil {
@@ -50,6 +52,10 @@ public class PointUtil {
 
         // 重新查询最新余额
         userPoint = userPointMapper.selectOne(wrapper);
+        if (userPoint == null) {
+            log.warn("积分账户查询为空，userId={}", userId);
+            return;
+        }
 
         // 检查等级升级
         int newLevel = calculateLevel(userPoint.getTotalPoints());

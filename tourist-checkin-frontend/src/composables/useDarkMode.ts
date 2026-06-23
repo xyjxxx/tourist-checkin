@@ -15,6 +15,13 @@ watch(isDark, (val) => {
   localStorage.setItem('darkMode', String(val))
 })
 
+// 跨标签页同步暗黑模式
+window.addEventListener('storage', (e) => {
+  if (e.key === 'darkMode' && e.newValue !== null) {
+    isDark.value = e.newValue === 'true'
+  }
+})
+
 export function useDarkMode() {
   const toggle = () => {
     isDark.value = !isDark.value

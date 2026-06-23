@@ -1,0 +1,76 @@
+<view class="login-container">
+  <!-- Background decoration -->
+  <view class="bg-deco bg-deco-1"></view>
+  <view class="bg-deco bg-deco-2"></view>
+  <view class="bg-deco bg-deco-3"></view>
+  <view class="bg-deco bg-deco-4"></view>
+
+  <view class="logo-area anim-fade-in-down">
+    <view class="logo-placeholder">
+      <image class="logo-img" src="/assets/logo-travel.jpg" mode="aspectFill"></image>
+    </view>
+    <text class="app-name">拾光旅记</text>
+    <text class="app-subtitle">赏山河岁岁安然，叹流年倏忽而过，用心落笔，收藏当下所有温柔光景。</text>
+  </view>
+
+  <view class="form-card anim-slide-up" style="animation-delay: 200ms;">
+    <!-- 账号 -->
+    <view class="input-group anim-fade-in-up anim-delay-3">
+      <view class="input-wrapper">
+        <text class="input-prefix">👤</text>
+        <input class="input-field" placeholder="请输入账号或邮箱" placeholder-class="placeholder-style"
+               value="{{account}}" bindinput="onAccountInput" />
+      </view>
+    </view>
+
+    <!-- 密码 -->
+    <view class="input-group anim-fade-in-up anim-delay-4">
+      <view class="input-wrapper">
+        <text class="input-prefix">🔒</text>
+        <input class="input-field" placeholder="请输入密码" placeholder-class="placeholder-style" password
+               value="{{password}}" bindinput="onPasswordInput" />
+      </view>
+    </view>
+
+    <!-- 昵称（仅注册） -->
+    <view class="input-group anim-fade-in-up anim-delay-5" wx:if="{{mode === 'register'}}">
+      <view class="input-wrapper">
+        <text class="input-prefix">✏️</text>
+        <input class="input-field" placeholder="请输入昵称" placeholder-class="placeholder-style"
+               value="{{username}}" bindinput="onUsernameInput" />
+      </view>
+    </view>
+
+    <!-- 邮箱（仅注册） -->
+    <view class="input-group anim-fade-in-up anim-delay-5" wx:if="{{mode === 'register'}}">
+      <view class="input-wrapper">
+        <text class="input-prefix">📧</text>
+        <input class="input-field" placeholder="请输入邮箱（用于找回密码）" placeholder-class="placeholder-style"
+               value="{{email}}" bindinput="onEmailInput" type="text" />
+      </view>
+      <text class="input-hint">请绑定真实邮箱，否则无法找回密码</text>
+    </view>
+
+    <!-- 提交按钮 -->
+    <button class="submit-btn anim-fade-in-up anim-delay-6 {{loading ? 'btn-loading' : ''}}" bindtap="onSubmit" loading="{{loading}}">
+      {{mode === 'login' ? '登 录' : '注 册'}}
+    </button>
+
+    <!-- 切换登录/注册 -->
+    <view class="switch-area" bindtap="onSwitchMode">
+      <text class="switch-text">
+        {{mode === 'login' ? '没有账号？去注册' : '已有账号？去登录'}}
+      </text>
+    </view>
+
+    <!-- 忘记密码 -->
+    <view class="forgot-area" wx:if="{{mode === 'login'}}" bindtap="onForgotPassword">
+      <text class="forgot-text">忘记密码？</text>
+    </view>
+  </view>
+
+  <!-- Login success overlay -->
+  <view wx:if="{{loginSuccess}}" class="login-success-overlay anim-fade-in-scale">
+    <lottie path="/assets/lottie/login-success.json" autoplay="{{true}}" loop="{{false}}" width="200" height="200" />
+  </view>
+</view>

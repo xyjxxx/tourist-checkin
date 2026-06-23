@@ -67,10 +67,12 @@ export const updateBackground = (imageUrl: string): Promise<ApiResponse<string>>
 export const getUserList = (
   page: number = 1,
   size: number = 10,
-  keyword?: string
+  keyword?: string,
+  loginType?: string,
+  role?: string
 ): Promise<ApiResponse<AdminUserList>> => {
   return request.get('/user/admin/list', {
-    params: { page, size, keyword }
+    params: { page, size, keyword, loginType, role }
   })
 }
 

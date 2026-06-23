@@ -1,0 +1,9 @@
+<view class="empty-container">
+  <lottie wx:if="{{lottiePath}}" path="{{lottiePath}}" width="240" height="240" loop="{{true}}" autoplay="{{true}}" />
+  <text wx:elif="{{icon}}" class="empty-icon">{{icon}}</text>
+  <text wx:if="{{title}}" class="empty-title">{{title}}</text>
+  <text wx:if="{{subtitle}}" class="empty-subtitle">{{subtitle}}</text>
+  <view wx:if="{{actionText}}" class="empty-action btn-primary" bindtap="onAction">
+    <text>{{actionText}}</text>
+  </view>
+</view>

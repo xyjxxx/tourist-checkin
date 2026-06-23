@@ -1,0 +1,99 @@
+<view class="page-container" wx:if="{{checkin}}">
+  <!-- Author header -->
+  <view class="detail-header">
+    <view class="author-row" bindtap="onTapAuthor" data-userid="{{checkin.userId}}">
+      <image class="author-avatar" src="{{checkin.avatar}}" mode="aspectFill"></image>
+      <view class="author-info">
+        <text class="author-name">{{checkin.username}}</text>
+        <text class="checkin-time">{{checkin.timeText}}</text>
+      </view>
+    </view>
+    <view class="location-row" wx:if="{{checkin.locationName}}">
+      <text class="location-icon">📍</text>
+      <text class="location-name">{{checkin.locationName}}</text>
+    </view>
+  </view>
+
+  <!-- Content -->
+  <view class="detail-content" wx:if="{{checkin.content}}">
+    <text class="content-text">{{checkin.content}}</text>
+  </view>
+
+  <!-- Images -->
+  <view class="image-grid" wx:if="{{checkin.images && checkin.images.length > 0}}"
+        style="grid-template-columns: {{checkin.images.length === 1 ? '1fr' : (checkin.images.length === 2 ? '1fr 1fr' : (checkin.images.length === 4 ? '1fr 1fr' : '1fr 1fr 1fr'))}}">
+    <view wx:for="{{checkin.images}}" wx:key="*this" class="image-item"
+          style="aspect-ratio: {{checkin.images.length === 1 ? '4/3' : '1'}}">
+      <image src="{{item}}" mode="aspectFill" class="grid-image" bindtap="onPreviewImage" data-src="{{item}}"></image>
+    </view>
+  </view>
+
+  <!-- Map -->
+  <view class="map-area" wx:if="{{checkin.longitude && checkin.latitude}}">
+    <map longitude="{{checkin.longitude}}" latitude="{{checkin.latitude}}" markers="{{markers}}" style="width:100%;height:300rpx" show-location></map>
+  </view>
+
+  <!-- Actions -->
+  <view class="action-bar">
+    <view class="action-btn" bindtap="onLike">
+      <text class="action-icon {{liked ? 'liked' : ''}}">♥</text>
+      <text class="action-text">{{checkin.likeCount || 0}}</text>
+    </view>
+    <view class="action-btn" bindtap="onShowCommentInput">
+      <text class="action-icon">💬</text>
+      <text class="action-text">{{checkin.commentCount || 0}}</text>
+    </view>
+    <view class="action-btn" open-type="share">
+      <text class="action-icon">📤</text>
+      <text class="action-text">分享</text>
+    </view>
+    <view class="action-btn" bindtap="onReport" wx:if="{{!isOwner}}">
+      <text class="action-icon">⚠</text>
+      <text class="action-text">举报</text>
+    </view>
+    <view class="action-btn action-delete" bindtap="onDelete" wx:if="{{isOwner}}">
+      <text class="action-icon">🗑</text>
+      <text class="action-text">删除</text>
+    </view>
+  </view>
+
+  <!-- Comments -->
+  <view class="comment-section">
+    <view class="section-title">评论 ({{comments.length}})</view>
+    <view wx:if="{{comments.length === 0}}" class="empty-tip">暂无评论，快来抢沙发~</view>
+    <view wx:for="{{comments}}" wx:key="id" class="comment-item">
+      <view class="comment-main">
+        <view class="comment-header">
+          <text class="comment-user">{{item.username || '匿名用户'}}</text>
+          <text class="comment-time">{{item.timeText}}</text>
+        </view>
+        <text class="comment-content">{{item.content}}</text>
+        <view class="comment-actions">
+          <text class="comment-action" bindtap="onLikeComment" data-id="{{item.id}}">♥ {{item.likeCount || 0}}</text>
+          <text class="comment-action" bindtap="onReplyComment"
+                data-commentid="{{item.id}}" data-userid="{{item.userId}}" data-username="{{item.username || '匿名用户'}}">回复</text>
+        </view>
+        <view wx:if="{{item.replies && item.replies.length > 0}}" class="replies">
+          <view wx:for="{{item.replies}}" wx:for-item="reply" wx:key="id" class="reply-item">
+            <text class="reply-user">{{reply.username || '匿名用户'}}</text>
+            <text class="reply-content">{{reply.content}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Comment input -->
+  <view class="comment-input-bar" wx:if="{{showCommentInput}}">
+    <view class="input-mask" bindtap="onCloseCommentInput"></view>
+    <view class="input-area">
+      <input class="comment-input" placeholder="{{replyingTo ? '回复 ' + replyingTo.username : '写评论...'}}"
+             value="{{commentText}}" bindinput="onCommentInput" focus="{{showCommentInput}}" />
+      <text class="send-btn" bindtap="onSubmitComment">发送</text>
+    </view>
+  </view>
+</view>
+
+<view wx:if="{{loading}}" class="loading-state">
+  <text>加载中...</text>
+</view>

@@ -1,0 +1,23 @@
+<view class="page-container">
+  <view class="note-list">
+    <view wx:for="{{noteList}}" wx:key="id" class="note-item" bindtap="onTapNote" data-id="{{item.id}}">
+      <image class="note-cover" src="{{item.coverImage}}" mode="aspectFill"></image>
+      <view class="note-body">
+        <text class="note-title">{{item.title}}</text>
+        <view class="note-meta">
+          <text class="author-name">{{item.authorName}}</text>
+          <text class="note-city" wx:if="{{item.city}}">{{item.city}}</text>
+        </view>
+        <view class="note-stats">
+          <text class="stat">👁 {{item.viewCount || 0}}</text>
+          <text class="stat">♥ {{item.likeCount || 0}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+  <view wx:if="{{!loading && noteList.length === 0}}" class="empty-state">
+    <text class="empty-icon">⭐</text>
+    <text class="empty-text">还没有收藏的游记</text>
+  </view>
+  <view wx:if="{{loading}}" class="loading-more"><text>加载中...</text></view>
+</view>
