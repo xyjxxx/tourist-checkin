@@ -1,6 +1,6 @@
 -- ============================================================
 -- 拾光旅记 (Tourist Check-in) 完整数据库初始化脚本
--- 合并自: init.sql + migration_v2.sql + migration_v3_fixes.sql + migration_v4_account.sql + fix_test_user.sql
+-- 合并自: init.sql + migration_v2.sql + migration_v3_fixes.sql + migration_v4_account.sql + fix_test_user.sql + MIGRATION_2026-06-05.sql
 -- 数据库: tourist_checkin
 -- 字符集: utf8mb4
 -- ============================================================
@@ -16,12 +16,13 @@ USE tourist_checkin;
 -- ============================================================
 CREATE TABLE `user` (
     `id` BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '用户ID',
-    `account` VARCHAR(50) NOT NULL COMMENT '登录账号(唯一)',
+    `account` VARCHAR(50) DEFAULT NULL COMMENT '登录账号(唯一)',
     `username` VARCHAR(50) NOT NULL COMMENT '用户昵称',
-    `password` VARCHAR(100) NOT NULL COMMENT '密码(BCrypt加密)',
+    `password` VARCHAR(100) DEFAULT NULL COMMENT '密码(BCrypt加密)',
     `avatar` VARCHAR(500) COMMENT '头像URL',
     `background_image` VARCHAR(500) COMMENT '背景图URL',
     `email` VARCHAR(100) COMMENT '邮箱',
+    `openid` VARCHAR(64) DEFAULT NULL COMMENT '微信openid',
     `role` VARCHAR(20) DEFAULT 'USER' COMMENT '角色: USER/ADMIN/SUPER_ADMIN',
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -67,6 +68,7 @@ CREATE TABLE `check_in` (
     `content` TEXT COMMENT '打卡文字内容',
     `images` JSON COMMENT '图片URL数组',
     `check_in_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '打卡时间',
+    `like_count` INT DEFAULT 0 COMMENT '点赞数',
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '记录创建时间',
     `deleted` TINYINT DEFAULT 0 COMMENT '是否删除: 0-否 1-是',
     CONSTRAINT `fk_checkin_user` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -98,7 +100,8 @@ CREATE TABLE `check_in_like` (
 -- ============================================================
 CREATE TABLE `comment` (
     `id` BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '评论ID',
-    `check_in_id` BIGINT NOT NULL COMMENT '打卡ID',
+    `check_in_id` BIGINT DEFAULT NULL COMMENT '打卡ID',
+    `note_id` BIGINT DEFAULT NULL COMMENT '游记ID',
     `user_id` BIGINT NOT NULL COMMENT '评论者ID',
     `parent_id` BIGINT DEFAULT NULL COMMENT '父评论ID（NULL=顶级评论）',
     `reply_to_id` BIGINT DEFAULT NULL COMMENT '被回复的评论ID',
@@ -114,6 +117,7 @@ CREATE TABLE `comment` (
     CONSTRAINT `fk_comment_reply_to` FOREIGN KEY (`reply_to_id`) REFERENCES `comment`(`id`) ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT `fk_comment_reply_user` FOREIGN KEY (`reply_to_user_id`) REFERENCES `user`(`id`) ON DELETE SET NULL ON UPDATE CASCADE,
     INDEX `idx_check_in` (`check_in_id`),
+    INDEX `idx_note` (`note_id`),
     INDEX `idx_user` (`user_id`),
     INDEX `idx_parent` (`parent_id`),
     INDEX `idx_created` (`created_at`),
@@ -481,8 +485,8 @@ INSERT INTO `location` (`name`, `address`, `longitude`, `latitude`, `category`, 
 -- BCrypt哈希由 BCryptPasswordEncoder.encode("123456") 生成
 -- ============================================================
 INSERT INTO `user` (`account`, `username`, `password`, `email`, `role`) VALUES
-('test', 'test', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iAt6Z5EO', 'test@example.com', 'USER'),
-('admin', 'admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iAt6Z5EO', 'admin@example.com', 'ADMIN');
+('test', 'test', '$2a$10$2nfgoNbLxRc/Utp2Jhgo6eICqT54AfzzevpaHVAGLKC7YXF6VsiQq', 'test@example.com', 'USER'),
+('admin', 'admin', '$2a$10$2nfgoNbLxRc/Utp2Jhgo6eICqT54AfzzevpaHVAGLKC7YXF6VsiQq', 'admin@example.com', 'ADMIN');
 
 -- ============================================================
 -- 种子数据: 成就定义
@@ -544,6 +548,53 @@ LEFT JOIN follow f2 ON f2.follower_id = u.id AND f2.status = 1
 LEFT JOIN user_point up ON up.user_id = u.id
 WHERE u.deleted = 0
 GROUP BY u.id, u.account, u.username, up.total_points, up.level;
+
+-- ============================================================
+-- 模块 14: 用户自荐美食店铺
+-- ============================================================
+
+ALTER TABLE `merchant_position`
+    ADD COLUMN `source` TINYINT DEFAULT 0 COMMENT '0=管理员创建 1=用户推荐' AFTER `status`,
+    ADD COLUMN `recommend_id` BIGINT DEFAULT NULL COMMENT '来源shop_recommend.id' AFTER `source`;
+
+CREATE TABLE `shop_recommend` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `user_id` BIGINT NOT NULL COMMENT '推荐人ID',
+    `name` VARCHAR(255) NOT NULL COMMENT '店铺名称',
+    `category` VARCHAR(64) NOT NULL COMMENT '菜系: 火锅/小吃/中餐/西餐/甜品/烧烤/海鲜/饮品/其他',
+    `address` VARCHAR(500) NOT NULL COMMENT '详细地址',
+    `longitude` DECIMAL(10,7) NOT NULL,
+    `latitude` DECIMAL(10,7) NOT NULL,
+    `city` VARCHAR(64) DEFAULT NULL,
+    `avg_price` INT DEFAULT 0 COMMENT '人均价格(元)',
+    `images` JSON NOT NULL COMMENT '实拍图片数组',
+    `recommend_reason` TEXT NOT NULL COMMENT '推荐理由',
+    `signature_dish` VARCHAR(500) DEFAULT NULL COMMENT '招牌菜品',
+    `business_hours` VARCHAR(255) DEFAULT NULL COMMENT '营业时间',
+    `phone` VARCHAR(32) DEFAULT NULL COMMENT '联系方式',
+    `warning` VARCHAR(500) DEFAULT NULL COMMENT '避雷提醒',
+    `audit_status` TINYINT DEFAULT 0 COMMENT '0=待审 1=通过 -1=驳回',
+    `audit_reason` VARCHAR(500) DEFAULT NULL COMMENT '驳回原因',
+    `auditor_id` BIGINT DEFAULT NULL,
+    `audit_time` DATETIME DEFAULT NULL,
+    `merchant_id` BIGINT DEFAULT NULL COMMENT '审核通过后关联merchant_position.id',
+    `like_count` INT DEFAULT 0,
+    `collect_count` INT DEFAULT 0,
+    `is_featured` TINYINT DEFAULT 0 COMMENT '是否宝藏店铺',
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `deleted` TINYINT DEFAULT 0,
+    INDEX `idx_user` (`user_id`),
+    INDEX `idx_status` (`audit_status`),
+    INDEX `idx_city` (`city`, `category`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户自荐美食店铺';
+
+CREATE TABLE `shop_recommend_like` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `recommend_id` BIGINT NOT NULL,
+    `user_id` BIGINT NOT NULL,
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY `uk_recommend_user` (`recommend_id`, `user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='推荐点赞';
 
 -- ============================================================
 -- 完成
